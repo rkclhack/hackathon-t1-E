@@ -19,7 +19,11 @@ const inputUserName = ref("")
 // #region browser event handler
 // 入室メッセージをクライアントに送信する
 const onEnter = () => {
-  // ユーザー名が入力されているかチェック
+  // ユーザー名が入力されているかチェック(未入力でエラーメッセージ出す)
+   if (!inputUserName.value.trim()) {
+    alert("ユーザー名を入力してください。")
+    return
+  }  
 
   // 入室メッセージを送信
 
