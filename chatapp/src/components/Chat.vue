@@ -49,6 +49,10 @@ onMounted(() => {
 // #region browser event handler
 // 投稿メッセージをサーバに送信する
 const onPublish = () => {
+  if (!chatContent.value.trim()) {
+    alert("投稿内容を入力してください")
+    return ;
+  }
   const chatInfo = chat(chatContent.value, isImportant.value, userName.value);
   socket.emit("publishEvent", chatInfo)
   // 入力欄を初期化
@@ -63,14 +67,14 @@ const onExit = () => {
 
 // メモを画面上に表示する
 const onMemo = () => {
-  // メモの内容を表示
-  if (!chatContent.value)
+  if (!chatContent.value.trim()) {
     alert("メモ内容を入力してください")
-  else {
-    memoList.value.unshift(chatContent.value)
-    // 入力欄を初期化
-    chatContent.value = ""
+    return ;
   }
+  // メモの内容を表示
+  memoList.value.unshift(chatContent.value)
+  // 入力欄を初期化
+  chatContent.value = ""
 }
 // #endregion
 
@@ -119,6 +123,10 @@ const registerSocketEvent = () => {
       <p>ログインユーザ：{{ userName }}さん</p>
       <textarea v-model="chatContent" placeholder="投稿文を入力してください" rows="4" class="area"></textarea>
       <div class="mt-5">
+        <v-switch
+          v-model="isImportant"
+          label="重要">
+        </v-switch>
         <button @click="onPublish"  class="button-normal">投稿</button>
         <button @click="onMemo" class="button-normal util-ml-8px">メモ</button>
       </div>
