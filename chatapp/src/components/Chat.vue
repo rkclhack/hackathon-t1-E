@@ -103,6 +103,11 @@ const registerSocketEvent = () => {
     <router-link to="/" class="link">
       <button type="button" class="button-normal button-exit" @click="onExit">退室する</button>
     </router-link>
+    <ul class="memo">
+      <li v-for="memo in memoList" :key="memo">
+        {{ memo }}
+      </li>
+    </ul>
   </div>
 </template>
 
