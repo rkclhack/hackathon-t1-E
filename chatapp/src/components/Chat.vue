@@ -11,10 +11,24 @@ const socket = socketManager.getInstance()
 // #endregion
 
 // #region reactive variable
-const chatContent = ref("")
-const chatList = reactive([])
 
+const chatContent = ref("")
+const isImportant = ref(false)
+
+const chatList = reactive([])
 const memoList = ref([])
+
+function chat(chatContent, isImportant, userName) {
+  // TODO: validate
+
+  return ({
+    chatContent: chatContent,
+    isImportant: isImportant,
+    userName: userName,
+    sendAt: new Date()
+  })
+}
+
 // #endregion
 
 
@@ -27,6 +41,7 @@ onMounted(() => {
 // #region browser event handler
 // 投稿メッセージをサーバに送信する
 const onPublish = () => {
+
   socket.emit("publishEvent",chatContent.value)
   // 入力欄を初期化
   chatContent.value=""
