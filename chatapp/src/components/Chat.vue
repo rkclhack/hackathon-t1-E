@@ -4,6 +4,7 @@ import socketManager from '../socketManager.js'
 
 // #region global state
 const userName = inject("userName")
+const userRole = inject("userRole") 
 // #endregion
 
 // #region local variable
@@ -27,7 +28,18 @@ onMounted(() => {
 // #region browser event handler
 // 投稿メッセージをサーバに送信する
 const onPublish = () => {
-  socket.emit("publishEvent",chatContent.value)
+  // socket.emit("publishEvent",chatContent.value)
+  console.log("emit内容", {
+  user: userName.value,
+  text: chatContent.value,
+  role: userRole.value,
+})
+
+  socket.emit("publishEvent", {
+  user: userName.value,
+  text: chatContent.value,
+  role: userRole.value,
+})
   // 入力欄を初期化
   chatContent.value=""
 
@@ -35,7 +47,8 @@ const onPublish = () => {
 
 // 退室メッセージをサーバに送信する
 const onExit = () => {
-
+  socket.emit("exitEvent", { user: userName.value });
+  router.push({ name: "login" });
 }
 
 // メモを画面上に表示する
@@ -50,12 +63,12 @@ const onMemo = () => {
 // #region socket event handler
 // サーバから受信した入室メッセージ画面上に表示する
 const onReceiveEnter = (data) => {
-  chatList.push()
+  chatList.push(data)
 }
 
 // サーバから受信した退室メッセージを受け取り画面上に表示する
 const onReceiveExit = (data) => {
-  chatList.push()
+  chatList.push(data)
 }
 
 // サーバから受信した投稿メッセージを画面上に表示する
@@ -68,14 +81,26 @@ const onReceivePublish = (data) => {
 // イベント登録をまとめる
 const registerSocketEvent = () => {
   // 入室イベントを受け取ったら実行
+  // socket.on("enterEvent", (data) => {
+  //   chatList.push(`${data.user} さんが入出しました`)
+  // })
   socket.on("enterEvent", (data) => {
-
+  chatList.push({
+    type: "system",
+    text: `${data.user} さんが入室しました`
   })
+})
 
   // 退室イベントを受け取ったら実行
+  // socket.on("exitEvent", (data) => {
+  //   chatList.push(`${data.user} さんが退出しました`)
+  // })
   socket.on("exitEvent", (data) => {
-
+  chatList.push({
+    type: "system",
+    text: `${data.user} さんが退出しました`
   })
+})
 
   // 投稿イベントを受け取ったら実行
   socket.on("publishEvent", (data) => {
@@ -95,9 +120,23 @@ const registerSocketEvent = () => {
         <button @click="onPublish"  class="button-normal">投稿</button>
         <button @click="onMemo" class="button-normal util-ml-8px">メモ</button>
       </div>
-      <div class="mt-5" v-if="chatList.length !== 0">
+      <!-- <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
           <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat }}</li>
+        </ul>
+      </div> -->
+      <div class="mt-5" v-if="chatList.length !== 0">
+        <ul>
+          <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">
+            <template v-if="chat.type === 'system'">
+              <p class="system-message">{{ chat.text }}</p>
+            </template>
+            <template v-else>
+              <p :class="{ 'executive-message': chat.role === 'executive' }">
+                {{ chat.user }}: {{ chat.text }}
+              </p>
+            </template>
+          </li>
         </ul>
       </div>
     </div>
