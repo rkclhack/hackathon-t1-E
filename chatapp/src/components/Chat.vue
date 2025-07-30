@@ -29,6 +29,14 @@ function chat(chatContent, isImportant, userName) {
   })
 }
 
+const toJpnTime = (sendAt) =>
+  new Date(sendAt).toLocaleTimeString("ja-JP",
+    { timeZone: "Asia/Tokyo",
+      hour: "2-digit",
+      minute: "2-digit"
+    }
+  )
+
 // #endregion
 
 
@@ -56,9 +64,13 @@ const onExit = () => {
 // メモを画面上に表示する
 const onMemo = () => {
   // メモの内容を表示
-  memoList.value.unshift(chatContent.value)
-  // 入力欄を初期化
-  chatContent.value = ""
+  if (!chatContent.value)
+    alert("メモ内容を入力してください")
+  else {
+    memoList.value.unshift(chatContent.value)
+    // 入力欄を初期化
+    chatContent.value = ""
+  }
 }
 // #endregion
 
@@ -112,8 +124,10 @@ const registerSocketEvent = () => {
       </div>
       <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
-          <ul>
-            <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat.chatContent }}</li>
+          <ul v-for="(chat, i) in chatList">
+            <li class="item mt-4" :key="i">{{ chat.userName }}</li>
+            <li class="item mt-4" :key="i">{{ toJpnTime(chat.sendAt) }}</li>
+            <li class="item mt-4" :key="i">{{ chat.chatContent }}</li>
           </ul>
         </ul>
       </div>
