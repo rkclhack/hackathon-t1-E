@@ -73,7 +73,7 @@ const onReceiveExit = (data) => {
 
 // サーバから受信した投稿メッセージを画面上に表示する
 const onReceivePublish = (data) => {
-  chatList.push(data)
+  chatList.unshift(data)
 }
 // #endregion
 
@@ -85,9 +85,13 @@ const registerSocketEvent = () => {
   //   chatList.push(`${data.user} さんが入出しました`)
   // })
   socket.on("enterEvent", (data) => {
+<<<<<<< HEAD
   chatList.push({
     type: "system",
     text: `${data.user} さんが入室しました`
+=======
+    chatList.push(`${data.user} さんが入出しました`)
+>>>>>>> b671fd0b73a7c3878c033742558d459b63bb91f2
   })
 })
 
@@ -96,9 +100,13 @@ const registerSocketEvent = () => {
   //   chatList.push(`${data.user} さんが退出しました`)
   // })
   socket.on("exitEvent", (data) => {
+<<<<<<< HEAD
   chatList.push({
     type: "system",
     text: `${data.user} さんが退出しました`
+=======
+    chatList.push(`${data.user} さんが退出しました`)
+>>>>>>> b671fd0b73a7c3878c033742558d459b63bb91f2
   })
 })
 

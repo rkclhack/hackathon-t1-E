@@ -30,11 +30,15 @@ const onEnter = () => {
   }  
 
   // 入室メッセージを送信
+<<<<<<< HEAD
   // socket.emit("enterEvent", {user: inputUserName.value})
   socket.emit("enterEvent", {
   user: inputUserName.value,
   role: userRole.value
 })
+=======
+  socket.emit("enterEvent", { user: inputUserName.value });
+>>>>>>> b671fd0b73a7c3878c033742558d459b63bb91f2
   // 全体で使用するnameに入力されたユーザー名を格納
   userName.value = inputUserName.value
   // チャット画面へ遷移
