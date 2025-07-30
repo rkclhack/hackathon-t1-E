@@ -1,7 +1,7 @@
 <script setup>
 import { ref, provide } from "vue"
 
-const message = ref("Hello World!")
+const message = ref("World!")
 provide("message", message)
 
 </script>
