@@ -163,7 +163,7 @@ const registerSocketEvent = () => {
         <button type="button" class="button-normal button-exit" @click="onExit">退室</button>
       </router-link>
     </header>
-    <div class="chat-list"></div>
+    <div class="chat-list">
       <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
           <li v-for="(chat, i) in chatList" :key="i">
@@ -180,6 +180,7 @@ const registerSocketEvent = () => {
         </ul>
       </div>
     </div>
+  </div>
 
 
     <div class="chat-input-area">
