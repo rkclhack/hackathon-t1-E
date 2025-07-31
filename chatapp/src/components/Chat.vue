@@ -43,7 +43,6 @@ const toJpnTime = (sendAt) =>
 
 // #endregion
 
-
 // #region lifecycle
 onMounted(() => {
   registerSocketEvent()
@@ -88,6 +87,10 @@ const registerSocketEvent = () => {
       <p>ログインユーザ：{{ userName }}さん</p>
       <textarea v-model="chatContent" placeholder="投稿文を入力してください" rows="4" class="area"></textarea>
       <div class="mt-5">
+        <v-switch
+          v-model="isImportant"
+          label="重要">
+        </v-switch>
         <button @click="onPublish"  class="button-normal">投稿</button>
       </div>
       <div class="mt-5" v-if="chatList.length !== 0">
