@@ -81,7 +81,7 @@ const onReceivePublish = (data) => {
   if (
     isSupported &&
     data.userName !== userName.value &&
-    data.isExecutive === true &&    // 幹部かどうか
+    // data.isExecutive === true &&    // 幹部かどうか
     data.isImportant === true       // 重要かどうか
   ) {
     show({
