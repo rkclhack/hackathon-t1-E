@@ -57,6 +57,8 @@ const findLatestMessage = (userName) => {
   )
 }
 
+const deleteFlag = ref(false)
+
 provide("chatList", chatList)
 
 // #endregion
@@ -74,7 +76,9 @@ const onPublish = () => {
   socket.emit("publishEvent", chatInfo)
   // 入力欄を初期化
   chatContent.value=""
-
+  
+  // コメント削除を可能に変更
+  deleteFlag.value = true
 }
 
 // #endregion
@@ -95,6 +99,11 @@ const onReceivePublish = (data) => {
 }
 
 const onDeleteMessage = () => {
+  if(!deleteFlag.value){
+    alert("連続でメッセージは削除できません")
+    return
+  }
+
   const latestChat = findLatestMessage(userName.value)
   if(!latestChat){
     alert("削除するメッセージがありません")
@@ -107,6 +116,7 @@ const onDeleteMessage = () => {
     sendAt: latestChat.sendAt
   })
 
+  deleteFlag.value = false
   alert("メッセージが削除されました")
 }
 
