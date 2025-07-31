@@ -179,18 +179,6 @@ const registerSocketEvent = () => {
             </li>
           </ul>
         </div>
-        <div class="chat-input-area">
-          <textarea v-model="chatContent" placeholder="投稿文を入力してください" rows="4" class="chat-input"></textarea>
-          <div class="mt-5">
-            <v-switch
-              v-model="isImportant"
-              label="重要"
-              :disabled="!isExecutive">
-            </v-switch>
-            <button @click="onDeleteMessage" class="delete-btn">削除</button>
-            <button @click="onPublish" class="send-btn">投稿</button>
-          </div>
-        </div>
       </div>
       <div class="important-chat-list">
         <important-chat></important-chat>
@@ -420,36 +408,6 @@ body {
     font-size: 0.8rem; 
     color: #666;
     margin-left: auto;
-  }
-
-  .chat-input-area {
-    display: flex;
-    align-items: center;
-    background-color: #f2eebf;
-    border-top: 1px solid #c0c0c0;
-    padding: 0.5rem;
-  }
-
-  .chat-input {
-    flex: 0 0 50%; 
-    height: 2.5rem;
-    background-color: #ffffff; 
-    border: 1px solid #ff6600;
-    border-radius: 4px;
-    padding: 0.4rem;
-    margin-right: 1rem;
-  }
-
-  .send-btn {
-    flex: 0 0 auto;
-    background-color: #ff6600;
-    border: none;
-    color: #fff;
-    font-size: 1.1rem;
-    border-radius: 4px;
-    padding: 0.5rem 0.8rem;
-    margin-right: 1rem;
-    cursor: pointer;
   }
 
   .important-wrapper {
