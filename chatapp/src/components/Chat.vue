@@ -89,14 +89,20 @@ const onPublish = () => {
 // サーバから受信した投稿メッセージを画面上に表示する
 const onReceivePublish = (data) => {
   chatList.unshift(data)
-
-   // 通知サポート＆自分の投稿じゃないときだけ表示
-  if (isSupported && data.userName !== userName.value) {
+  
+   // 幹部による重要メッセージだけ通知
+  if (
+    isSupported &&
+    data.userName !== userName.value &&
+    // data.isExecutive === true &&    // 幹部かどうか
+    data.isImportant === true       // 重要かどうか
+  ) {
     show({
-      title: `${data.userName} さんからの新着メッセージ`,
+      title: `【重要】${data.userName} さんのメッセージ`,
       body: data.chatContent,
     })
   }
+  
 }
 
 const onDeleteMessage = () => {
@@ -157,12 +163,6 @@ const registerSocketEvent = () => {
         <button type="button" class="button-normal button-exit" @click="onExit">退室</button>
       </router-link>
     </header>
-      <div class="mt-5">
-        <label>
-          <input type="checkbox" v-model="isImportant" :disabled="!isExecutive" />
-          重要メッセージにする（※幹部のみ）
-        </label>
-      </div>
     <div class="chat-list"></div>
       <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
@@ -187,7 +187,8 @@ const registerSocketEvent = () => {
       <div class="mt-5">
         <v-switch
           v-model="isImportant"
-          label="重要">
+          label="重要"
+          :disabled="!isExecutive">
         </v-switch>
         <button @click="onDeleteMessage" class="delete-btn">削除</button>
         <button @click="onPublish"  class="send-btn">投稿</button>
@@ -302,6 +303,11 @@ const registerSocketEvent = () => {
     border-radius: 4px;
     padding: 0.5rem 0.8rem;
     cursor: pointer;
+  }
+
+  .executive-message {
+  font-weight: bold;
+  color: red;
   }
 
   .delete-btn {
