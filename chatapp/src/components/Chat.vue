@@ -14,18 +14,20 @@ const socket = socketManager.getInstance()
 
 const chatContent = ref("")
 const isImportant = ref(false)
+const isExecutive = ref(false)
 
 const chatList = reactive([])
 const memoList = ref([])
 
-function chat(chatContent, isImportant, userName) {
+function chat(chatContent, isImportant, userName, isexecutive) {
   // TODO: validate
 
   return ({
     chatContent: chatContent,
     isImportant: isImportant,
     userName: userName,
-    sendAt: new Date()
+    sendAt: new Date(),
+    isexecutive: isexecutive
   })
 }
 
@@ -49,7 +51,7 @@ onMounted(() => {
 // #region browser event handler
 // 投稿メッセージをサーバに送信する
 const onPublish = () => {
-  const chatInfo = chat(chatContent.value, isImportant.value, userName.value);
+  const chatInfo = chat(chatContent.value, isImportant.value, userName.value, isExecutive.value);
   socket.emit("publishEvent", chatInfo)
   // 入力欄を初期化
   chatContent.value=""
@@ -58,7 +60,8 @@ const onPublish = () => {
 
 // 退室メッセージをサーバに送信する
 const onExit = () => {
-
+  socket.emit("exitEvent", { user: userName.value });
+  router.push({ name: "login" });
 }
 
 // メモを画面上に表示する
@@ -77,17 +80,17 @@ const onMemo = () => {
 // #region socket event handler
 // サーバから受信した入室メッセージ画面上に表示する
 const onReceiveEnter = (data) => {
-  chatList.push()
+  chatList.push(data)
 }
 
 // サーバから受信した退室メッセージを受け取り画面上に表示する
 const onReceiveExit = (data) => {
-  chatList.push()
+  chatList.push(data)
 }
 
 // サーバから受信した投稿メッセージを画面上に表示する
 const onReceivePublish = (data) => {
-  chatList.push(data)
+  chatList.unshift(data)
 }
 // #endregion
 
@@ -96,12 +99,12 @@ const onReceivePublish = (data) => {
 const registerSocketEvent = () => {
   // 入室イベントを受け取ったら実行
   socket.on("enterEvent", (data) => {
-
+    chatList.push(`${data.user} さんが入出しました`)
   })
 
   // 退室イベントを受け取ったら実行
   socket.on("exitEvent", (data) => {
-
+    chatList.push(`${data.user} さんが退出しました`)
   })
 
   // 投稿イベントを受け取ったら実行
