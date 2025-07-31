@@ -47,7 +47,20 @@ function chat(chatContent, isImportant, userName, isExecutive) {
   })
 }
 
+
+const findLatestMessage = (userName) => {
+  const userChats = chatList.filter(chat => chat.userName === userName)
+  if (userChats.length === 0) return null
+
+  return userChats.reduce((latest, current) =>
+    new Date(current.sendAt) > new Date(latest.sendAt) ? current : latest
+  )
+}
+
+const deleteFlag = ref(false)
+
 provide("chatList", chatList)
+
 // #endregion
 
 // #region lifecycle
@@ -59,11 +72,14 @@ onMounted(() => {
 // #region browser event handler
 // 投稿メッセージをサーバに送信する
 const onPublish = () => {
-  const chatInfo = chat(chatContent.value, isImportant.value, userName.value, isExecutive.value);
+   // 幹部以外がチェックしても無効化（信頼できない人間に負けないコード）
+  const importantFlag = isExecutive?.value ? isImportant.value : false
+  const chatInfo = chat(chatContent.value, importantFlag, userName.value, isExecutive.value);
   socket.emit("publishEvent", chatInfo)
   // 入力欄を初期化
   chatContent.value=""
-
+  isImportant.value = false
+  deleteFlag.value = true
 }
 
 // #endregion
@@ -73,13 +89,52 @@ const onPublish = () => {
 // サーバから受信した投稿メッセージを画面上に表示する
 const onReceivePublish = (data) => {
   chatList.unshift(data)
-
-   // 通知サポート＆自分の投稿じゃないときだけ表示
-  if (isSupported && data.userName !== userName.value) {
+  
+   // 幹部による重要メッセージだけ通知
+  if (
+    isSupported &&
+    data.userName !== userName.value &&
+    // data.isExecutive === true &&    // 幹部かどうか
+    data.isImportant === true       // 重要かどうか
+  ) {
     show({
-      title: `${data.userName} さんからの新着メッセージ`,
+      title: `【重要】${data.userName} さんのメッセージ`,
       body: data.chatContent,
     })
+  }
+  
+}
+
+const onDeleteMessage = () => {
+  if(!deleteFlag.value){
+    alert("連続でメッセージは削除できません")
+    return
+  }
+
+  const latestChat = findLatestMessage(userName.value)
+  if(!latestChat){
+    alert("削除するメッセージがありません")
+    return
+  }
+  console.log(latestChat)
+  
+  socket.emit("deleteEvent",{
+    userName: userName.value,
+    sendAt: latestChat.sendAt
+  })
+
+  deleteFlag.value = false
+  alert("メッセージが削除されました")
+}
+
+const onReceiveDelete = (deleteInfo) => {
+  const index = chatList.findIndex(chat => 
+    chat.userName === deleteInfo.userName && 
+    chat.sendAt === deleteInfo.sendAt
+  )
+  
+  if (index !== -1) {
+    chatList.splice(index, 1)
   }
 }
 // #endregion
@@ -91,6 +146,10 @@ const registerSocketEvent = () => {
   socket.on("publishEvent", (data) => {
     onReceivePublish(data)
   })
+
+  socket.on("deleteEvent", (deleteInfo) => {
+    onReceiveDelete(deleteInfo)
+  });
 }
 // #endregion
 </script>
@@ -104,7 +163,6 @@ const registerSocketEvent = () => {
         <button type="button" class="button-normal button-exit" @click="onExit">退室</button>
       </router-link>
     </header>
-
     <div class="chat-list">
       <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
@@ -258,4 +316,21 @@ const registerSocketEvent = () => {
   .important-wrapper .v-chip { 
     order: 2; margin-left: 0.5rem;
   }
+
+    .executive-message {
+  font-weight: bold;
+  color: red;
+  }
+
+  .delete-btn {
+    background-color: #ff6600;
+    border: none;
+    color: #fff;
+    font-size: 1.1rem;
+    border-radius: 4px;
+    padding: 0.5rem 0.8rem;
+    margin-right: 1rem;
+    cursor: pointer;
+  }
+
 </style>
