@@ -62,7 +62,6 @@ const onPublish = () => {
    // 幹部以外がチェックしても無効化（信頼できない人間に負けないコード）
   const importantFlag = isExecutive?.value ? isImportant.value : false
   const chatInfo = chat(chatContent.value, importantFlag, userName.value, isExecutive.value);
-  // const chatInfo = chat(chatContent.value, isImportant.value, userName.value, isExecutive.value);
   socket.emit("publishEvent", chatInfo)
   // 入力欄を初期化
   chatContent.value=""
