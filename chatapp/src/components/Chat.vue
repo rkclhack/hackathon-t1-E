@@ -47,7 +47,20 @@ function chat(chatContent, isImportant, userName, isExecutive) {
   })
 }
 
+
+const findLatestMessage = (userName) => {
+  const userChats = chatList.filter(chat => chat.userName === userName)
+  if (userChats.length === 0) return null
+
+  return userChats.reduce((latest, current) =>
+    new Date(current.sendAt) > new Date(latest.sendAt) ? current : latest
+  )
+}
+
+const deleteFlag = ref(false)
+
 provide("chatList", chatList)
+
 // #endregion
 
 // #region lifecycle
@@ -66,7 +79,7 @@ const onPublish = () => {
   // 入力欄を初期化
   chatContent.value=""
   isImportant.value = false
-
+  deleteFlag.value = true
 }
 
 // #endregion
@@ -91,6 +104,39 @@ const onReceivePublish = (data) => {
   }
   
 }
+
+const onDeleteMessage = () => {
+  if(!deleteFlag.value){
+    alert("連続でメッセージは削除できません")
+    return
+  }
+
+  const latestChat = findLatestMessage(userName.value)
+  if(!latestChat){
+    alert("削除するメッセージがありません")
+    return
+  }
+  console.log(latestChat)
+  
+  socket.emit("deleteEvent",{
+    userName: userName.value,
+    sendAt: latestChat.sendAt
+  })
+
+  deleteFlag.value = false
+  alert("メッセージが削除されました")
+}
+
+const onReceiveDelete = (deleteInfo) => {
+  const index = chatList.findIndex(chat => 
+    chat.userName === deleteInfo.userName && 
+    chat.sendAt === deleteInfo.sendAt
+  )
+  
+  if (index !== -1) {
+    chatList.splice(index, 1)
+  }
+}
 // #endregion
 
 // #region local methods
@@ -100,6 +146,10 @@ const registerSocketEvent = () => {
   socket.on("publishEvent", (data) => {
     onReceivePublish(data)
   })
+
+  socket.on("deleteEvent", (deleteInfo) => {
+    onReceiveDelete(deleteInfo)
+  });
 }
 // #endregion
 </script>
@@ -131,6 +181,7 @@ const registerSocketEvent = () => {
       </div>
     </div>
 
+
     <div class="chat-input-area">
       <textarea v-model="chatContent" placeholder="投稿文を入力してください" rows="4" class="chat-input"></textarea>
       <div class="mt-5">
@@ -139,6 +190,7 @@ const registerSocketEvent = () => {
           label="重要"
           :disabled="!isExecutive">
         </v-switch>
+        <button @click="onDeleteMessage" class="delete-btn">削除</button>
         <button @click="onPublish"  class="send-btn">投稿</button>
       </div>
 
@@ -258,4 +310,14 @@ const registerSocketEvent = () => {
   color: red;
   }
 
+  .delete-btn {
+    background-color: #ff6600;
+    border: none;
+    color: #fff;
+    font-size: 1.1rem;
+    border-radius: 4px;
+    padding: 0.5rem 0.8rem;
+    margin-right: 1rem;
+    cursor: pointer;
+  }
 </style>
