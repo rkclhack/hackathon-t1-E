@@ -35,6 +35,14 @@ function chat(chatContent, isImportant, userName, isexecutive) {
   })
 }
 
+const toJpnTime = (sendAt) =>
+  new Date(sendAt).toLocaleTimeString("ja-JP",
+    { timeZone: "Asia/Tokyo",
+      hour: "2-digit",
+      minute: "2-digit"
+    }
+  )
+
 // #endregion
 
 
@@ -119,9 +127,11 @@ const registerSocketEvent = () => {
       </div>
       <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
-          <ul>
-            <li style="white-space: pre-wrap;" class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat.chatContent }}</li>
-          </ul>
+          <li v-for="(chat, i) in chatList" :key="i">
+            <div class="item mt-4">{{ chat.userName }}</div>
+            <div class="item mt-4">{{ toJpnTime(chat.sendAt) }}</div>
+            <div style="white-space: pre-wrap;" class="item mt-4">{{ chat.chatContent }}</div>
+          </li>
         </ul>
       </div>
     </div>
