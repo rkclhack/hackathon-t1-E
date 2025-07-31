@@ -117,7 +117,7 @@ const registerSocketEvent = () => {
 
 <template>
   <div class="mx-auto my-5 px-4">
-    <h1 class="text-h3 font-weight-medium">Vue.js Chat チャットルーム</h1>
+    <h1 class="text-h3 font-weight-medium">バレーボール同好会</h1>
     <div class="mt-10">
       <p>ログインユーザ：{{ userName }}さん</p>
       <textarea v-model="chatContent" placeholder="投稿文を入力してください" rows="4" class="area"></textarea>

@@ -36,20 +36,85 @@ const onEnter = () => {
 </script>
 
 <template>
-  <div class="mx-auto my-5 px-4">
-    <h1 class="text-h3 font-weight-medium">Vue.js Chat サンプル</h1>
-    <div class="mt-10">
-      <p>ユーザー名</p>
-      <input v-model="inputUserName" type="text" class="user-name-text" />
+  <div class="login-container">
+    <div class="login-box">
+      <h1 class="title">誰も取り残さないチャットアプリ</h1>
+      <div class="input-group">
+        <label for="username">ユーザー名</label>
+        <input v-model="inputUserName" type="text" class="user-name-text" placeholder="ユーザー名" />
+      </div>
+      <button type="button" @click="onEnter" class="button-normal">入室する</button>
     </div>
-    <button type="button" @click="onEnter" class="button-normal">入室する</button>
   </div>
 </template>
 
 <style scoped>
-.user-name-text {
-  width: 200px;
-  border: 1px solid #888;
-  margin-bottom: 16px;
-}
+  .login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #ffffff;
+    padding: 0 1rem;
+  }
+
+  .login-box {
+    background-color: #fff3e0;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+  }
+
+  .title {
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: #ff6600;
+    margin-bottom: 2rem;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto 1.5rem;
+    max-width: 300px;
+  }
+
+  .input-group label {
+    margin-bottom: 0.5rem;
+    color: #333;
+    width: 100%;
+    text-align: center;
+  }
+
+  .user-name-text {
+    width: 100%;
+    padding: 0.5rem;
+    border: 2px solid #ff6600;
+    border-radius: 6px;
+    font-size: 1rem;
+    margin-bottom: 0;
+  }
+
+  .button-normal {
+    width: 100%;
+    max-width: 300px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #ffffff;
+    background-color: #ff6600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .button-normal:hover {
+    background-color: #e65500;
+  }
 </style>
