@@ -6,9 +6,6 @@ import socketManager from '../socketManager.js'
 // #region global state
 const userName = inject("userName")
 const userRole = inject("userRole")
-const isExecutive = computed(() => userRole.value === "executive")
-// provide("userRole", userRole)
-provide("isExecutive", isExecutive) // ← 追加
 // #endregion
 
 // #region local variable
