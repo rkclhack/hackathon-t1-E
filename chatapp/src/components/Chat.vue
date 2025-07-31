@@ -123,11 +123,11 @@ const registerSocketEvent = () => {
       </div>
       <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
-          <ul v-for="(chat, i) in chatList">
-            <li class="item mt-4" :key="i">{{ chat.userName }}</li>
-            <li class="item mt-4" :key="i">{{ toJpnTime(chat.sendAt) }}</li>
-            <li class="item mt-4" :key="i">{{ chat.chatContent }}</li>
-          </ul>
+          <li v-for="(chat, i) in chatList">
+            <div class="item mt-4" :key="i">{{ chat.userName }}</div>
+            <div class="item mt-4" :key="i">{{ toJpnTime(chat.sendAt) }}</div>
+            <div class="item mt-4" :key="i">{{ chat.chatContent }}</div>
+          </li>
         </ul>
       </div>
     </div>
