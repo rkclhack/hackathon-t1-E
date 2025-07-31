@@ -187,6 +187,7 @@ const registerSocketEvent = () => {
               label="重要"
               :disabled="!isExecutive">
             </v-switch>
+            <button @click="onDeleteMessage" class="delete-btn">削除</button>
             <button @click="onPublish" class="send-btn">投稿</button>
           </div>
         </div>
