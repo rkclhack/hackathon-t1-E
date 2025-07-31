@@ -1,6 +1,10 @@
 <script setup>
-import { inject, ref, reactive, onMounted } from "vue"
+import { inject, ref, reactive, onMounted, computed, provide } from "vue"
 import socketManager from '../socketManager.js'
+import { useWebNotification } from '@vueuse/core'
+
+import toJpnTime from "../utils/toJpnTime.js"
+import ImportantChat from "./ImportantChat.vue"
 
 // #region global state
 const userName = inject("userName")
@@ -11,11 +15,21 @@ const isExecutive = inject("isExecutive")
 const socket = socketManager.getInstance()
 // #endregion
 
-// #region reactive variable
+const { isSupported, show, notification } = useWebNotification({
+  title: 'チャット通知',
+  dir: 'auto',
+  lang: 'ja',
+  renotify: true,
+  tag: 'chat-message',
+})
 
+// #region reactive variable
 const chatContent = ref("")
 const isImportant = ref(false)
 const chatList = reactive([])
+const importantChatList = computed(() =>
+  chatList.filter((chat) => chat.isImportant === true)
+)
 
 function chat(chatContent, isImportant, userName, isExecutive) {
   // TODO: validate
@@ -33,13 +47,6 @@ function chat(chatContent, isImportant, userName, isExecutive) {
   })
 }
 
-const toJpnTime = (sendAt) =>
-  new Date(sendAt).toLocaleTimeString("ja-JP",
-    { timeZone: "Asia/Tokyo",
-      hour: "2-digit",
-      minute: "2-digit"
-    }
-  )
 
 const findLatestMessage = (userName) => {
   const userChats = chatList.filter(chat => chat.userName === userName)
@@ -49,8 +56,10 @@ const findLatestMessage = (userName) => {
     new Date(current.sendAt) > new Date(latest.sendAt) ? current : latest
   )
 }
-// #endregion
 
+provide("chatList", chatList)
+
+// #endregion
 
 // #region lifecycle
 onMounted(() => {
@@ -75,6 +84,14 @@ const onPublish = () => {
 // サーバから受信した投稿メッセージを画面上に表示する
 const onReceivePublish = (data) => {
   chatList.unshift(data)
+
+   // 通知サポート＆自分の投稿じゃないときだけ表示
+  if (isSupported && data.userName !== userName.value) {
+    show({
+      title: `${data.userName} さんからの新着メッセージ`,
+      body: data.chatContent,
+    })
+  }
 }
 
 const onDeleteMessage = () => {
@@ -127,6 +144,10 @@ const registerSocketEvent = () => {
       <p>ログインユーザ：{{ userName }}さん</p>
       <textarea v-model="chatContent" placeholder="投稿文を入力してください" rows="4" class="area"></textarea>
       <div class="mt-5">
+        <v-switch
+          v-model="isImportant"
+          label="重要">
+        </v-switch>
         <button @click="onPublish"  class="button-normal">投稿</button>
       </div>
       <div class="mt-5" v-if="chatList.length !== 0">
@@ -151,6 +172,7 @@ const registerSocketEvent = () => {
     <router-link to="/" class="link">
       <button type="button" class="button-normal button-exit" @click="onExit">退室する</button>
     </router-link>
+    <important-chat></important-chat>
   </div>
 </template>
 
@@ -177,4 +199,10 @@ const registerSocketEvent = () => {
   color: #000;
   margin-top: 8px;
 }
+
+.executive-message {
+  font-weight: bold;
+  color: red;
+}
+
 </style>
