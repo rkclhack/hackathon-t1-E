@@ -21,7 +21,11 @@ const memoList = ref([])
 
 function chat(chatContent, isImportant, userName, isexecutive) {
   // TODO: validate
-
+  if (chatContent.trim() === '') {
+    alert("メッセージが空です")
+    return
+  }
+  
   return ({
     chatContent: chatContent,
     isImportant: isImportant,
@@ -43,10 +47,6 @@ onMounted(() => {
 // #region browser event handler
 // 投稿メッセージをサーバに送信する
 const onPublish = () => {
-  if (chatContent.value.trim() === '') {
-    alert("メッセージが空です")
-    return
-  }
   const chatInfo = chat(chatContent.value, isImportant.value, userName.value, isExecutive.value);
   socket.emit("publishEvent", chatInfo)
   // 入力欄を初期化
