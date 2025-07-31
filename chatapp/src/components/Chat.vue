@@ -27,9 +27,6 @@ const { isSupported, show, notification } = useWebNotification({
 const chatContent = ref("")
 const isImportant = ref(false)
 const chatList = reactive([])
-const importantChatList = computed(() =>
-  chatList.filter((chat) => chat.isImportant === true)
-)
 
 function chat(chatContent, isImportant, userName, isExecutive) {
   // TODO: validate
@@ -37,7 +34,7 @@ function chat(chatContent, isImportant, userName, isExecutive) {
     alert("メッセージが空です")
     return
   }
-  
+
   return ({
     chatContent: chatContent,
     isImportant: isImportant,
@@ -106,25 +103,25 @@ const onReceivePublish = (data) => {
 }
 
 const onDeleteMessage = () => {
-  if(!deleteFlag.value){
-    alert("連続でメッセージは削除できません")
-    return
-  }
+  const isConfirmed =confirm('本当に削除しますか？')
 
   const latestChat = findLatestMessage(userName.value)
   if(!latestChat){
     alert("削除するメッセージがありません")
     return
   }
+  if(!deleteFlag.value){
+    alert("連続でメッセージは削除できません")
+    return
+  }
   console.log(latestChat)
-  
-  socket.emit("deleteEvent",{
-    userName: userName.value,
-    sendAt: latestChat.sendAt
-  })
-
-  deleteFlag.value = false
-  alert("メッセージが削除されました")
+  if (isConfirmed){
+    socket.emit("deleteEvent",{
+      userName: userName.value,
+      sendAt: latestChat.sendAt
+    })
+    deleteFlag.value = false
+  }
 }
 
 const onReceiveDelete = (deleteInfo) => {
@@ -163,150 +160,191 @@ const registerSocketEvent = () => {
         <button type="button" class="button-normal button-exit" @click="onExit">退室</button>
       </router-link>
     </header>
-    <div class="chat-list">
-      <div class="mt-5" v-if="chatList.length !== 0">
-        <ul>
-          <li
-            v-for="(chat, i) in chatList"
-            :key="i"
+    <div class="chat-inner">
+      <div class="chat-list">
+        <div class="mt-5" v-if="chatList.length !== 0">
+          <ul>
+            <li v-for="(chat, i) in chatList" :key="i"
             :class="{ 'mine': chat.userName === userName }"
-          >
-            <div class="item mt-4">{{ chat.userName }}</div>
-            <div class="item mt-4">{{ toJpnTime(chat.sendAt) }}</div>
-            <div
-              class="item mt-4"
-              :class="{ 'executive-message': chat.isExecutive }"
-              style="white-space: pre-wrap;"
             >
-              {{ chat.chatContent }}
-            </div>
-          </li>
-        </ul>
+              <div class="item mt-4">{{ chat.userName }}</div>
+              <div class="item mt-4">{{ toJpnTime(chat.sendAt) }}</div>
+              <div
+                class="item mt-4"
+                :class="{ 'executive-message': chat.isExecutive }"
+                style="white-space: pre-wrap;"
+              >
+                {{ chat.chatContent }}
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="chat-input-area">
+          <textarea v-model="chatContent" placeholder="投稿文を入力してください" rows="4" class="chat-input"></textarea>
+          <div class="mt-5">
+            <v-switch
+              v-model="isImportant"
+              label="重要"
+              :disabled="!isExecutive">
+            </v-switch>
+            <button @click="onPublish" class="send-btn">投稿</button>
+          </div>
+        </div>
+      </div>
+      <div class="important-chat-list">
+        <important-chat></important-chat>
       </div>
     </div>
   </div>
-
-
-    <div class="chat-input-area">
-      <textarea v-model="chatContent" placeholder="投稿文を入力してください" rows="4" class="chat-input"></textarea>
-      <div class="mt-5">
-        <v-switch
-          v-model="isImportant"
-          label="重要"
-          :disabled="!isExecutive">
-        </v-switch>
-        <button @click="onDeleteMessage" class="delete-btn">削除</button>
-        <button @click="onPublish"  class="send-btn">投稿</button>
-      </div>
-
-    </div>
-
 </template>
 
 <style scoped>
-  .link {
-    text-decoration: none;
+body {
+  overflow-y: hidden;
+}
+
+.link {
+  text-decoration: none;
+}
+
+.area {
+  width: 500px;
+  border: 1px solid #000;
+  margin-top: 8px;
+}
+
+.item {
+  display: block;
+}
+
+.util-ml-8px {
+  margin-left: 8px;
+}
+
+.button-exit {
+  margin-left: 1.5rem;
+  background-color: #e53935;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+}
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+}
+
+.chat-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: #ff6600;
+  color: #fff;
+  border-bottom: 2px solid #c0c0c0;
+  padding: 0 1rem;
+  height: 78px;
+}
+
+.chat-header h1 {
+  margin-right: auto;
+}
+
+.chat-list {
+  overflow-y: auto;
+  /* padding: 1rem; */
+  width: 60%;
+}
+
+.chat-list li {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  background-color: #fff3e0;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  margin-bottom: 0.6rem;
+  max-width: 500px;
+}
+
+.chat-list li .item {
+  display: inline;
+}
+
+.chat-list li .item:nth-child(1) {
+  order: 1;
+  font-weight: 600;
+}
+
+.chat-list li .item:nth-child(3) {
+  order: 2;
+  flex: 1;
+}
+
+.chat-list li .item:nth-child(2) {
+  order: 3;
+  font-size: 0.8rem;
+  color: #666;
+  margin-left: auto;
+}
+
+.chat-input-area {
+  position: absolute;
+  display: flex;
+  bottom: 0;
+  width: 60%;
+  align-items: center;
+  background-color: #f2eebf;
+  border-top: 1px solid #c0c0c0;
+  padding: 0.5rem;
+}
+
+.chat-input {
+  flex: 1;
+  height: 2.5rem;
+  background-color: #ffffff;
+  border: 1px solid #ff6600;
+  border-radius: 4px;
+  padding: 0.4rem;
+  margin-right: 0.5rem;
+}
+
+.send-btn {
+  background-color: #ff6600;
+  border: none;
+  color: #fff;
+  font-size: 1.1rem;
+  border-radius: 4px;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+}
+
+.chat-inner {
+  display: flex;
+  flex-direction: row;
+  height: calc(100vh - 80px);
+}
+
+.important-chat-list {
+  width: 40%;
+  height: calc(100vh - 80px);
+  border-left: 1px solid #282828;
   }
 
-  .area {
-    width: 500px;
-    border: 1px solid #000;
-    margin-top: 8px;
+  .executive-message {
+  font-weight: bold;
+  color: red;
   }
 
-  .item {
-    display: block;
-  }
-
-  .util-ml-8px {
-    margin-left: 8px;
-  }
-
-  .button-exit {
-    margin-left: 1.5rem;
-    background-color: #e53935;
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    padding: 0.5rem 1rem;
-  }
-
-  .chat-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    background-color: #ffffff;
-  }
-
-  .chat-header {
-    display: flex;
-    justify-content: flex-start; 
-    align-items: center;
-    background-color: #ff6600;
-    color: #fff;
-    border-bottom: 2px solid #c0c0c0;
-    padding: 0.8rem 1rem;
-  }
-
-  .chat-header h1 {
-    margin-right: auto;
-  }
-
-  .chat-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1rem;
-  }
-
-  .chat-list li {
-    list-style: none;
-    display: flex;
-    align-items: center;
-    background-color: #fff3e0;
-    border-radius: 6px;
-    padding: 0.4rem 0.8rem;
-    margin-bottom: 0.6rem;
-    max-width: 500px; 
-  }
-
-  .chat-list li .item {
-    display: inline;        
-  }
-
-  .chat-list li .item:nth-child(1) { order: 1; font-weight: 600; }
-  .chat-list li .item:nth-child(3) { order: 2; flex: 1; }
-  .chat-list li .item:nth-child(2) { 
-    order: 3; 
-    font-size: 0.8rem; 
-    color: #666;
-    margin-left: auto;
-  }
-
-  .chat-input-area {
-    display: flex;
-    align-items: center;
-    background-color: #f2eebf;
-    border-top: 1px solid #c0c0c0;
-    padding: 0.5rem;
-  }
-
-  .chat-input {
-    flex: 1;
-    height: 2.5rem;
-    background-color: #ffffff; 
-    border: 1px solid #ff6600;
-    border-radius: 4px;
-    padding: 0.4rem;
-    margin-right: 0.5rem;
-  }
-
-  .send-btn {
+  .delete-btn {
     background-color: #ff6600;
     border: none;
     color: #fff;
     font-size: 1.1rem;
     border-radius: 4px;
     padding: 0.5rem 0.8rem;
+    margin-right: 1rem;
     cursor: pointer;
   }
 
