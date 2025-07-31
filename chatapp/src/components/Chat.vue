@@ -183,7 +183,7 @@ const registerSocketEvent = () => {
 
     <div class="chat-input-area">
       <textarea v-model="chatContent" placeholder="投稿文を入力してください" rows="4" class="chat-input"></textarea>
-      <div class="important-wrapper">
+      <div class="important-wrapper" v-if="isExecutive">
         <v-chip v-if="isImportant" color="red lighten-1" text-color="white" small>
           重要
         </v-chip>
