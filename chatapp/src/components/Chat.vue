@@ -21,7 +21,11 @@ const memoList = ref([])
 
 function chat(chatContent, isImportant, userName, isexecutive) {
   // TODO: validate
-
+  if (chatContent.trim() === '') {
+    alert("メッセージが空です")
+    return
+  }
+  
   return ({
     chatContent: chatContent,
     isImportant: isImportant,
@@ -126,7 +130,7 @@ const registerSocketEvent = () => {
           <li v-for="(chat, i) in chatList" :key="i">
             <div class="item mt-4">{{ chat.userName }}</div>
             <div class="item mt-4">{{ toJpnTime(chat.sendAt) }}</div>
-            <div class="item mt-4">{{ chat.chatContent }}</div>
+            <div style="white-space: pre-wrap;" class="item mt-4">{{ chat.chatContent }}</div>
           </li>
         </ul>
       </div>
