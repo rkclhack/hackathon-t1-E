@@ -4,7 +4,6 @@ import socketManager from '../socketManager.js'
 
 // #region global state
 const userName = inject("userName")
-const userRole = inject("userRole") 
 // #endregion
 
 // #region local variable
@@ -12,10 +11,38 @@ const socket = socketManager.getInstance()
 // #endregion
 
 // #region reactive variable
-const chatContent = ref("")
-const chatList = reactive([])
 
+const chatContent = ref("")
+const isImportant = ref(false)
+const isExecutive = ref(false)
+
+const chatList = reactive([])
 const memoList = ref([])
+
+function chat(chatContent, isImportant, userName, isexecutive) {
+  // TODO: validate
+  if (chatContent.trim() === '') {
+    alert("メッセージが空です")
+    return
+  }
+  
+  return ({
+    chatContent: chatContent,
+    isImportant: isImportant,
+    userName: userName,
+    sendAt: new Date(),
+    isexecutive: isexecutive
+  })
+}
+
+const toJpnTime = (sendAt) =>
+  new Date(sendAt).toLocaleTimeString("ja-JP",
+    { timeZone: "Asia/Tokyo",
+      hour: "2-digit",
+      minute: "2-digit"
+    }
+  )
+
 // #endregion
 
 
@@ -28,18 +55,8 @@ onMounted(() => {
 // #region browser event handler
 // 投稿メッセージをサーバに送信する
 const onPublish = () => {
-  // socket.emit("publishEvent",chatContent.value)
-  console.log("emit内容", {
-  user: userName.value,
-  text: chatContent.value,
-  role: userRole.value,
-})
-
-  socket.emit("publishEvent", {
-  user: userName.value,
-  text: chatContent.value,
-  role: userRole.value,
-})
+  const chatInfo = chat(chatContent.value, isImportant.value, userName.value, isExecutive.value);
+  socket.emit("publishEvent", chatInfo)
   // 入力欄を初期化
   chatContent.value=""
 
@@ -81,34 +98,14 @@ const onReceivePublish = (data) => {
 // イベント登録をまとめる
 const registerSocketEvent = () => {
   // 入室イベントを受け取ったら実行
-  // socket.on("enterEvent", (data) => {
-  //   chatList.push(`${data.user} さんが入出しました`)
-  // })
   socket.on("enterEvent", (data) => {
-<<<<<<< HEAD
-  chatList.push({
-    type: "system",
-    text: `${data.user} さんが入室しました`
-=======
     chatList.push(`${data.user} さんが入出しました`)
->>>>>>> b671fd0b73a7c3878c033742558d459b63bb91f2
   })
-})
 
   // 退室イベントを受け取ったら実行
-  // socket.on("exitEvent", (data) => {
-  //   chatList.push(`${data.user} さんが退出しました`)
-  // })
   socket.on("exitEvent", (data) => {
-<<<<<<< HEAD
-  chatList.push({
-    type: "system",
-    text: `${data.user} さんが退出しました`
-=======
     chatList.push(`${data.user} さんが退出しました`)
->>>>>>> b671fd0b73a7c3878c033742558d459b63bb91f2
   })
-})
 
   // 投稿イベントを受け取ったら実行
   socket.on("publishEvent", (data) => {
@@ -128,22 +125,12 @@ const registerSocketEvent = () => {
         <button @click="onPublish"  class="button-normal">投稿</button>
         <button @click="onMemo" class="button-normal util-ml-8px">メモ</button>
       </div>
-      <!-- <div class="mt-5" v-if="chatList.length !== 0">
-        <ul>
-          <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat }}</li>
-        </ul>
-      </div> -->
       <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
-          <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">
-            <template v-if="chat.type === 'system'">
-              <p class="system-message">{{ chat.text }}</p>
-            </template>
-            <template v-else>
-              <p :class="{ 'executive-message': chat.role === 'executive' }">
-                {{ chat.user }}: {{ chat.text }}
-              </p>
-            </template>
+          <li v-for="(chat, i) in chatList" :key="i">
+            <div class="item mt-4">{{ chat.userName }}</div>
+            <div class="item mt-4">{{ toJpnTime(chat.sendAt) }}</div>
+            <div style="white-space: pre-wrap;" class="item mt-4">{{ chat.chatContent }}</div>
           </li>
         </ul>
       </div>
