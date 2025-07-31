@@ -5,6 +5,7 @@ import { useWebNotification } from '@vueuse/core'
 
 import toJpnTime from "../utils/toJpnTime.js"
 import ImportantChat from "./ImportantChat.vue"
+import Schedule from "./Schedule.vue"
 
 // #region global state
 const userName = inject("userName")
@@ -183,6 +184,7 @@ const registerSocketEvent = () => {
       <div class="important-chat-list">
         <important-chat></important-chat>
       </div>
+      <schedule></schedule>
     </div>
 
     <div class="chat-input-area">
