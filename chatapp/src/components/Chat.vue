@@ -166,7 +166,22 @@ const registerSocketEvent = () => {
     <div class="chat-list">
       <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
-          <li v-for="(chat, i) in chatList" :key="i">
+          <!-- <li v-for="(chat, i) in chatList" :key="i">
+            <div class="item mt-4">{{ chat.userName }}</div>
+            <div class="item mt-4">{{ toJpnTime(chat.sendAt) }}</div>
+            <div
+              class="item mt-4"
+              :class="{ 'executive-message': chat.isExecutive }"
+              style="white-space: pre-wrap;"
+            >
+              {{ chat.chatContent }}
+            </div>
+          </li> -->
+          <li
+            v-for="(chat, i) in chatList"
+            :key="i"
+            :class="{ 'mine': chat.userName === userName }"
+          >
             <div class="item mt-4">{{ chat.userName }}</div>
             <div class="item mt-4">{{ toJpnTime(chat.sendAt) }}</div>
             <div
@@ -321,4 +336,17 @@ const registerSocketEvent = () => {
     margin-right: 1rem;
     cursor: pointer;
   }
+
+  .chat-list li.mine {
+  margin-left: auto;
+  background-color: #e0f7fa; /* 色変えてもかわいい */
+  justify-content: flex-end;
+  text-align: right;
+  }
+  
+  .chat-list li.mine .item:nth-child(2) {
+    margin-left: 0;
+    margin-right: auto;
+  }
+
 </style>
