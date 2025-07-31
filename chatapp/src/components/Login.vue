@@ -2,11 +2,8 @@
 import { inject, ref, provide, computed } from "vue"
 import { useRouter } from "vue-router"
 import socketManager from '../socketManager.js'
-// import { provide } from "vue"
 
 // #region global state
-// const userName = inject("userName")
-// const userRole = inject("userRole")
 const userName = inject("userName")
 const userRole = inject("userRole")
 const isExecutive = computed(() => userRole.value === "executive")
@@ -22,8 +19,6 @@ const socket = socketManager.getInstance()
 // #region reactive variable
 const inputUserName = ref("")
 // #endregion
-
-// provide("userRole", userRole)
 
 // #region browser event handler
 // 入室メッセージをクライアントに送信する

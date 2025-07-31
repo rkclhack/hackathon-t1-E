@@ -15,10 +15,6 @@ const socket = socketManager.getInstance()
 
 const chatContent = ref("")
 const isImportant = ref(false)
-// const isExecutive = ref(false)
-// const isExecutive = Boolean(inject("isExecutive"))
-
-
 const chatList = reactive([])
 const memoList = ref([])
 
