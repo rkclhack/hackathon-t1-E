@@ -17,7 +17,6 @@ const isImportant = ref(false)
 const isExecutive = ref(false)
 
 const chatList = reactive([])
-const memoList = ref([])
 
 function chat(chatContent, isImportant, userName, isexecutive) {
   // TODO: validate
@@ -62,31 +61,9 @@ const onPublish = () => {
 
 }
 
-// 退室メッセージをサーバに送信する
-const onExit = () => {
-  socket.emit("exitEvent", { user: userName.value });
-  router.push({ name: "login" });
-}
-
-// メモを画面上に表示する
-const onMemo = () => {
-  // メモの内容を表示
-  memoList.value.unshift(chatContent.value)
-  // 入力欄を初期化
-  chatContent.value = ""
-}
 // #endregion
 
 // #region socket event handler
-// サーバから受信した入室メッセージ画面上に表示する
-const onReceiveEnter = (data) => {
-  chatList.push(data)
-}
-
-// サーバから受信した退室メッセージを受け取り画面上に表示する
-const onReceiveExit = (data) => {
-  chatList.push(data)
-}
 
 // サーバから受信した投稿メッセージを画面上に表示する
 const onReceivePublish = (data) => {
@@ -97,16 +74,6 @@ const onReceivePublish = (data) => {
 // #region local methods
 // イベント登録をまとめる
 const registerSocketEvent = () => {
-  // 入室イベントを受け取ったら実行
-  socket.on("enterEvent", (data) => {
-    chatList.push(`${data.user} さんが入出しました`)
-  })
-
-  // 退室イベントを受け取ったら実行
-  socket.on("exitEvent", (data) => {
-    chatList.push(`${data.user} さんが退出しました`)
-  })
-
   // 投稿イベントを受け取ったら実行
   socket.on("publishEvent", (data) => {
     onReceivePublish(data)
@@ -123,7 +90,6 @@ const registerSocketEvent = () => {
       <textarea v-model="chatContent" placeholder="投稿文を入力してください" rows="4" class="area"></textarea>
       <div class="mt-5">
         <button @click="onPublish"  class="button-normal">投稿</button>
-        <button @click="onMemo" class="button-normal util-ml-8px">メモ</button>
       </div>
       <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
@@ -138,11 +104,6 @@ const registerSocketEvent = () => {
     <router-link to="/" class="link">
       <button type="button" class="button-normal button-exit" @click="onExit">退室する</button>
     </router-link>
-    <ul class="memo">
-      <li v-for="memo in memoList" :key="memo">
-        {{ memo }}
-      </li>
-    </ul>
   </div>
 </template>
 
