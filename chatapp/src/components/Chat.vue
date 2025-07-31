@@ -41,6 +41,14 @@ const toJpnTime = (sendAt) =>
     }
   )
 
+const findLatestMessage = (userName) => {
+  const userChats = chatList.filter(chat => chat.userName === userName)
+  if (userChats.length === 0) return null
+
+  return userChats.reduce((latest, current) =>
+    new Date(current.sendAt) > new Date(latest.sendAt) ? current : latest
+  )
+}
 // #endregion
 
 
@@ -68,6 +76,31 @@ const onPublish = () => {
 const onReceivePublish = (data) => {
   chatList.unshift(data)
 }
+
+const onDeleteMessage = () => {
+  const latestChat = findLatestMessage(userName.value)
+  if(!latestChat){
+    alert("削除するメッセージがありません")
+    return
+  }
+  console.log(latestChat)
+  
+  socket.emit("deleteEvent",{
+    userName: userName.value,
+    sendAt: latestChat.sendAt
+  })
+}
+
+const onReceiveDelete = (deleteInfo) => {
+  const index = chatList.findIndex(chat => 
+    chat.userName === deleteInfo.userName && 
+    chat.sendAt === deleteInfo.sendAt
+  )
+  
+  if (index !== -1) {
+    chatList.splice(index, 1)
+  }
+}
 // #endregion
 
 // #region local methods
@@ -77,6 +110,10 @@ const registerSocketEvent = () => {
   socket.on("publishEvent", (data) => {
     onReceivePublish(data)
   })
+
+  socket.on("deleteEvent", (deleteInfo) => {
+    onReceiveDelete(deleteInfo)
+  });
 }
 // #endregion
 </script>
@@ -105,6 +142,9 @@ const registerSocketEvent = () => {
           </li>
         </ul>
       </div>
+    </div>
+    <div>
+      <button @click="onDeleteMessage" class="button-normal">取り消し</button>
     </div>
     <router-link to="/" class="link">
       <button type="button" class="button-normal button-exit" @click="onExit">退室する</button>
