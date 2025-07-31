@@ -14,18 +14,20 @@ const socket = socketManager.getInstance()
 
 const chatContent = ref("")
 const isImportant = ref(false)
+const isExecutive = ref(false)
 
 const chatList = reactive([])
 const memoList = ref([])
 
-function chat(chatContent, isImportant, userName) {
+function chat(chatContent, isImportant, userName, isexecutive) {
   // TODO: validate
 
   return ({
     chatContent: chatContent,
     isImportant: isImportant,
     userName: userName,
-    sendAt: new Date()
+    sendAt: new Date(),
+    isexecutive: isexecutive
   })
 }
 
@@ -41,7 +43,7 @@ onMounted(() => {
 // #region browser event handler
 // 投稿メッセージをサーバに送信する
 const onPublish = () => {
-  const chatInfo = chat(chatContent.value, isImportant.value, userName.value);
+  const chatInfo = chat(chatContent.value, isImportant.value, userName.value, isExecutive.value);
   socket.emit("publishEvent", chatInfo)
   // 入力欄を初期化
   chatContent.value=""
