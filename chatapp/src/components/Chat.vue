@@ -89,6 +89,8 @@ const onDeleteMessage = () => {
     userName: userName.value,
     sendAt: latestChat.sendAt
   })
+
+  alert("メッセージが削除されました")
 }
 
 const onReceiveDelete = (deleteInfo) => {
