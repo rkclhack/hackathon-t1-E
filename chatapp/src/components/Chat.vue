@@ -1,30 +1,38 @@
 <script setup>
 import { inject, ref, reactive, onMounted, computed, provide } from "vue"
 import socketManager from '../socketManager.js'
+import { useWebNotification } from '@vueuse/core'
 
 import toJpnTime from "../utils/toJpnTime.js"
 import ImportantChat from "./ImportantChat.vue"
 
 // #region global state
 const userName = inject("userName")
+const isExecutive = inject("isExecutive")
 // #endregion
 
 // #region local variable
 const socket = socketManager.getInstance()
 // #endregion
 
+const { isSupported, show, notification } = useWebNotification({
+  title: 'チャット通知',
+  dir: 'auto',
+  lang: 'ja',
+  renotify: true,
+  tag: 'chat-message',
+})
+
 // #region reactive variable
 const chatContent = ref("")
 const isImportant = ref(false)
-const isExecutive = ref(false)
-
 const chatList = reactive([])
 const memoList = ref([])
 const importantChatList = computed(() =>
   chatList.filter((chat) => chat.isImportant === true)
 )
 
-function chat(chatContent, isImportant, userName, isexecutive) {
+function chat(chatContent, isImportant, userName, isExecutive) {
   // TODO: validate
   if (chatContent.trim() === '') {
     alert("メッセージが空です")
@@ -36,7 +44,7 @@ function chat(chatContent, isImportant, userName, isexecutive) {
     isImportant: isImportant,
     userName: userName,
     sendAt: new Date(),
-    isexecutive: isexecutive
+    isExecutive: isExecutive
   })
 }
 
@@ -59,51 +67,27 @@ const onPublish = () => {
 
 }
 
-// 退室メッセージをサーバに送信する
-const onExit = () => {
-  socket.emit("exitEvent", { user: userName.value });
-  router.push({ name: "login" });
-}
-
-// メモを画面上に表示する
-const onMemo = () => {
-  // メモの内容を表示
-  memoList.value.unshift(chatContent.value)
-  // 入力欄を初期化
-  chatContent.value = ""
-}
 // #endregion
 
 // #region socket event handler
-// サーバから受信した入室メッセージ画面上に表示する
-const onReceiveEnter = (data) => {
-  chatList.push(data)
-}
-
-// サーバから受信した退室メッセージを受け取り画面上に表示する
-const onReceiveExit = (data) => {
-  chatList.push(data)
-}
 
 // サーバから受信した投稿メッセージを画面上に表示する
 const onReceivePublish = (data) => {
   chatList.unshift(data)
+
+   // 通知サポート＆自分の投稿じゃないときだけ表示
+  if (isSupported && data.userName !== userName.value) {
+    show({
+      title: `${data.userName} さんからの新着メッセージ`,
+      body: data.chatContent,
+    })
+  }
 }
 // #endregion
 
 // #region local methods
 // イベント登録をまとめる
 const registerSocketEvent = () => {
-  // 入室イベントを受け取ったら実行
-  socket.on("enterEvent", (data) => {
-    chatList.push(`${data.user} さんが入出しました`)
-  })
-
-  // 退室イベントを受け取ったら実行
-  socket.on("exitEvent", (data) => {
-    chatList.push(`${data.user} さんが退出しました`)
-  })
-
   // 投稿イベントを受け取ったら実行
   socket.on("publishEvent", (data) => {
     onReceivePublish(data)
@@ -124,14 +108,19 @@ const registerSocketEvent = () => {
           label="重要">
         </v-switch>
         <button @click="onPublish"  class="button-normal">投稿</button>
-        <button @click="onMemo" class="button-normal util-ml-8px">メモ</button>
       </div>
       <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
           <li v-for="(chat, i) in chatList" :key="i">
             <div class="item mt-4">{{ chat.userName }}</div>
             <div class="item mt-4">{{ toJpnTime(chat.sendAt) }}</div>
-            <div style="white-space: pre-wrap;" class="item mt-4">{{ chat.chatContent }}</div>
+            <div
+              class="item mt-4"
+              :class="{ 'executive-message': chat.isExecutive }"
+              style="white-space: pre-wrap;"
+            >
+              {{ chat.chatContent }}
+            </div>
           </li>
         </ul>
       </div>
@@ -140,11 +129,6 @@ const registerSocketEvent = () => {
       <button type="button" class="button-normal button-exit" @click="onExit">退室する</button>
     </router-link>
     <important-chat></important-chat>
-    <ul class="memo">
-      <li v-for="memo in memoList" :key="memo">
-        {{ memo }}
-      </li>
-    </ul>
   </div>
 </template>
 
@@ -171,4 +155,10 @@ const registerSocketEvent = () => {
   color: #000;
   margin-top: 8px;
 }
+
+.executive-message {
+  font-weight: bold;
+  color: red;
+}
+
 </style>
