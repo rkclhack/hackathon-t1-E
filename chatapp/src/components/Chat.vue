@@ -1,5 +1,5 @@
 <script setup>
-import { inject, ref, reactive, onMounted } from "vue"
+import { inject, ref, reactive, onMounted, computed } from "vue"
 import socketManager from '../socketManager.js'
 
 // #region global state
@@ -18,6 +18,9 @@ const isExecutive = ref(false)
 
 const chatList = reactive([])
 const memoList = ref([])
+const importantChatList = computed(() =>
+  chatList.filter((chat) => chat.isImportant === true)
+)
 
 function chat(chatContent, isImportant, userName, isexecutive) {
   // TODO: validate
