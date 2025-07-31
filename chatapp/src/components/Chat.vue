@@ -99,12 +99,12 @@ const onReceivePublish = (data) => {
 const registerSocketEvent = () => {
   // 入室イベントを受け取ったら実行
   socket.on("enterEvent", (data) => {
-    chatList.push(`${data.user} さんが入出しました`)
+    console.log(`${data.user} さんが入出しました`)
   })
 
   // 退室イベントを受け取ったら実行
   socket.on("exitEvent", (data) => {
-    chatList.push(`${data.user} さんが退出しました`)
+    console.log(`${data.user} さんが退出しました`)
   })
 
   // 投稿イベントを受け取ったら実行
