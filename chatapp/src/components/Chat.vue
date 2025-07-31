@@ -44,7 +44,20 @@ function chat(chatContent, isImportant, userName, isExecutive) {
   })
 }
 
+
+const findLatestMessage = (userName) => {
+  const userChats = chatList.filter(chat => chat.userName === userName)
+  if (userChats.length === 0) return null
+
+  return userChats.reduce((latest, current) =>
+    new Date(current.sendAt) > new Date(latest.sendAt) ? current : latest
+  )
+}
+
+const deleteFlag = ref(false)
+
 provide("chatList", chatList)
+
 // #endregion
 
 // #region lifecycle
@@ -56,11 +69,14 @@ onMounted(() => {
 // #region browser event handler
 // 投稿メッセージをサーバに送信する
 const onPublish = () => {
-  const chatInfo = chat(chatContent.value, isImportant.value, userName.value, isExecutive.value);
+   // 幹部以外がチェックしても無効化（信頼できない人間に負けないコード）
+  const importantFlag = isExecutive?.value ? isImportant.value : false
+  const chatInfo = chat(chatContent.value, importantFlag, userName.value, isExecutive.value);
   socket.emit("publishEvent", chatInfo)
   // 入力欄を初期化
-  chatContent.value = ""
-
+  chatContent.value=""
+  isImportant.value = false
+  deleteFlag.value = true
 }
 
 // #endregion
@@ -71,12 +87,51 @@ const onPublish = () => {
 const onReceivePublish = (data) => {
   chatList.unshift(data)
   
-  // 通知サポート＆自分の投稿じゃないときだけ表示
-  if (isSupported && data.userName !== userName.value) {
+   // 幹部による重要メッセージだけ通知
+  if (
+    isSupported &&
+    data.userName !== userName.value &&
+    // data.isExecutive === true &&    // 幹部かどうか
+    data.isImportant === true       // 重要かどうか
+  ) {
     show({
-      title: `${data.userName} さんからの新着メッセージ`,
+      title: `【重要】${data.userName} さんのメッセージ`,
       body: data.chatContent,
     })
+  }
+  
+}
+
+const onDeleteMessage = () => {
+  if(!deleteFlag.value){
+    alert("連続でメッセージは削除できません")
+    return
+  }
+
+  const latestChat = findLatestMessage(userName.value)
+  if(!latestChat){
+    alert("削除するメッセージがありません")
+    return
+  }
+  console.log(latestChat)
+  
+  socket.emit("deleteEvent",{
+    userName: userName.value,
+    sendAt: latestChat.sendAt
+  })
+
+  deleteFlag.value = false
+  alert("メッセージが削除されました")
+}
+
+const onReceiveDelete = (deleteInfo) => {
+  const index = chatList.findIndex(chat => 
+    chat.userName === deleteInfo.userName && 
+    chat.sendAt === deleteInfo.sendAt
+  )
+  
+  if (index !== -1) {
+    chatList.splice(index, 1)
   }
 }
 // #endregion
@@ -88,6 +143,10 @@ const registerSocketEvent = () => {
   socket.on("publishEvent", (data) => {
     onReceivePublish(data)
   })
+
+  socket.on("deleteEvent", (deleteInfo) => {
+    onReceiveDelete(deleteInfo)
+  });
 }
 // #endregion
 </script>
@@ -101,7 +160,6 @@ const registerSocketEvent = () => {
         <button type="button" class="button-normal button-exit" @click="onExit">退室</button>
       </router-link>
     </header>
-
     <div class="chat-inner">
       <div class="chat-list">
         <div class="mt-5" v-if="chatList.length !== 0">
@@ -109,7 +167,11 @@ const registerSocketEvent = () => {
             <li v-for="(chat, i) in chatList" :key="i">
               <div class="item mt-4">{{ chat.userName }}</div>
               <div class="item mt-4">{{ toJpnTime(chat.sendAt) }}</div>
-              <div class="item mt-4" :class="{ 'executive-message': chat.isExecutive }" style="white-space: pre-wrap;">
+              <div
+                class="item mt-4"
+                :class="{ 'executive-message': chat.isExecutive }"
+                style="white-space: pre-wrap;"
+              >
                 {{ chat.chatContent }}
               </div>
             </li>
@@ -118,7 +180,10 @@ const registerSocketEvent = () => {
         <div class="chat-input-area">
           <textarea v-model="chatContent" placeholder="投稿文を入力してください" rows="4" class="chat-input"></textarea>
           <div class="mt-5">
-            <v-switch v-model="isImportant" label="重要">
+            <v-switch
+              v-model="isImportant"
+              label="重要"
+              :disabled="!isExecutive">
             </v-switch>
             <button @click="onPublish" class="send-btn">投稿</button>
           </div>
@@ -263,5 +328,37 @@ body {
   width: 40%;
   height: calc(100vh - 80px);
   border-left: 1px solid #282828;
+  }
+
+  .executive-message {
+  font-weight: bold;
+  color: red;
+  }
+
+  .delete-btn {
+    background-color: #ff6600;
+    border: none;
+    color: #fff;
+    font-size: 1.1rem;
+    border-radius: 4px;
+    padding: 0.5rem 0.8rem;
+    margin-right: 1rem;
+    cursor: pointer;
+  }
+
+  .executive-message {
+  font-weight: bold;
+  color: red;
+  }
+
+  .delete-btn {
+    background-color: #ff6600;
+    border: none;
+    color: #fff;
+    font-size: 1.1rem;
+    border-radius: 4px;
+    padding: 0.5rem 0.8rem;
+    margin-right: 1rem;
+    cursor: pointer;
   }
 </style>
