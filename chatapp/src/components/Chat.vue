@@ -184,10 +184,10 @@ const registerSocketEvent = () => {
           </ul>
         </div>
       </div>
-      <div v-if="mode === '重要事項'" class="important-chat-list">
-        <important-chat></important-chat>
+      <div class="important-chat-list">
+        <important-chat v-show="mode === '重要事項'" :class="{ move: mode !== '重要事項' }"></important-chat>
       </div>
-      <schedule v-if="mode === 'スケジュール'"></schedule>
+      <schedule v-show="mode === 'スケジュール'" :class="{ move: mode !== 'スケジュール' }"></schedule>
       <drop-down-list></drop-down-list>
     </div>
 
@@ -456,5 +456,9 @@ body {
   .chat-list li.mine .item:nth-child(2) {
     margin-left: 0;
     margin-right: auto;
+  }
+
+  .move {
+    transform: translateX(1000%);
   }
 </style>
