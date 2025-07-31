@@ -61,25 +61,9 @@ const onPublish = () => {
 
 }
 
-// 退室メッセージをサーバに送信する
-const onExit = () => {
-  socket.emit("exitEvent", { user: userName.value });
-  router.push({ name: "login" });
-}
-
-
 // #endregion
 
 // #region socket event handler
-// サーバから受信した入室メッセージ画面上に表示する
-const onReceiveEnter = (data) => {
-  chatList.push(data)
-}
-
-// サーバから受信した退室メッセージを受け取り画面上に表示する
-const onReceiveExit = (data) => {
-  chatList.push(data)
-}
 
 // サーバから受信した投稿メッセージを画面上に表示する
 const onReceivePublish = (data) => {
@@ -90,16 +74,6 @@ const onReceivePublish = (data) => {
 // #region local methods
 // イベント登録をまとめる
 const registerSocketEvent = () => {
-  // 入室イベントを受け取ったら実行
-  socket.on("enterEvent", (data) => {
-    console.log(`${data.user} さんが入出しました`)
-  })
-
-  // 退室イベントを受け取ったら実行
-  socket.on("exitEvent", (data) => {
-    console.log(`${data.user} さんが退出しました`)
-  })
-
   // 投稿イベントを受け取ったら実行
   socket.on("publishEvent", (data) => {
     onReceivePublish(data)
