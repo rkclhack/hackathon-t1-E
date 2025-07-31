@@ -2,14 +2,17 @@
 import { inject, ref, provide, computed } from "vue"
 import { useRouter } from "vue-router"
 import socketManager from '../socketManager.js'
+import { watch } from "vue"
 
 // #region global state
 const userName = inject("userName")
-const userRole = inject("userRole")
+const userRole = inject("userRole", ref("general"))
 const isExecutive = computed(() => userRole.value === "executive")
-// provide("userRole", userRole)
-provide("isExecutive", isExecutive) // ← 追加
 // #endregion
+
+watch(userRole, (newVal) => {
+  console.log("選択された役割:", newVal)
+})
 
 // #region local variable
 const router = useRouter()

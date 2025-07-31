@@ -63,10 +63,14 @@ onMounted(() => {
 // #region browser event handler
 // 投稿メッセージをサーバに送信する
 const onPublish = () => {
-  const chatInfo = chat(chatContent.value, isImportant.value, userName.value, isExecutive.value);
+   // 幹部以外がチェックしても無効化（信頼できない人間に負けないコード）
+  const importantFlag = isExecutive?.value ? isImportant.value : false
+  const chatInfo = chat(chatContent.value, importantFlag, userName.value, isExecutive.value);
+  // const chatInfo = chat(chatContent.value, isImportant.value, userName.value, isExecutive.value);
   socket.emit("publishEvent", chatInfo)
   // 入力欄を初期化
   chatContent.value=""
+  isImportant.value = false
 
 }
 
@@ -140,6 +144,12 @@ const registerSocketEvent = () => {
       <div class="mt-5">
         <button @click="onPublish"  class="button-normal">投稿</button>
         <button @click="onMemo" class="button-normal util-ml-8px">メモ</button>
+      </div>
+      <div class="mt-5">
+        <label>
+          <input type="checkbox" v-model="isImportant" :disabled="!isExecutive" />
+          重要メッセージにする（※幹部のみ）
+        </label>
       </div>
       <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
