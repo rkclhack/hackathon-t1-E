@@ -4,6 +4,7 @@ import socketManager from '../socketManager.js'
 
 // #region global state
 const userName = inject("userName")
+const isExecutive = inject("isExecutive")
 // #endregion
 
 // #region local variable
@@ -14,12 +15,14 @@ const socket = socketManager.getInstance()
 
 const chatContent = ref("")
 const isImportant = ref(false)
-const isExecutive = ref(false)
+// const isExecutive = ref(false)
+// const isExecutive = Boolean(inject("isExecutive"))
+
 
 const chatList = reactive([])
 const memoList = ref([])
 
-function chat(chatContent, isImportant, userName, isexecutive) {
+function chat(chatContent, isImportant, userName, isExecutive) {
   // TODO: validate
   if (chatContent.trim() === '') {
     alert("メッセージが空です")
@@ -31,7 +34,7 @@ function chat(chatContent, isImportant, userName, isexecutive) {
     isImportant: isImportant,
     userName: userName,
     sendAt: new Date(),
-    isexecutive: isexecutive
+    isExecutive: isExecutive
   })
 }
 
@@ -130,7 +133,13 @@ const registerSocketEvent = () => {
           <li v-for="(chat, i) in chatList" :key="i">
             <div class="item mt-4">{{ chat.userName }}</div>
             <div class="item mt-4">{{ toJpnTime(chat.sendAt) }}</div>
-            <div style="white-space: pre-wrap;" class="item mt-4">{{ chat.chatContent }}</div>
+            <div
+              class="item mt-4"
+              :class="{ 'executive-message': chat.isExecutive }"
+              style="white-space: pre-wrap;"
+            >
+              {{ chat.chatContent }}
+            </div>
           </li>
         </ul>
       </div>

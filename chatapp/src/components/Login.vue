@@ -1,12 +1,17 @@
 <script setup>
-import { inject, ref } from "vue"
+import { inject, ref, provide, computed } from "vue"
 import { useRouter } from "vue-router"
 import socketManager from '../socketManager.js'
-import { provide } from "vue"
+// import { provide } from "vue"
 
 // #region global state
+// const userName = inject("userName")
+// const userRole = inject("userRole")
 const userName = inject("userName")
 const userRole = inject("userRole")
+const isExecutive = computed(() => userRole.value === "executive")
+// provide("userRole", userRole)
+provide("isExecutive", isExecutive) // ← 追加
 // #endregion
 
 // #region local variable
@@ -18,7 +23,7 @@ const socket = socketManager.getInstance()
 const inputUserName = ref("")
 // #endregion
 
-provide("userRole", userRole)
+// provide("userRole", userRole)
 
 // #region browser event handler
 // 入室メッセージをクライアントに送信する
