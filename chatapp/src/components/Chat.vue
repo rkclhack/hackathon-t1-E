@@ -27,7 +27,6 @@ const { isSupported, show, notification } = useWebNotification({
 const chatContent = ref("")
 const isImportant = ref(false)
 const chatList = reactive([])
-const memoList = ref([])
 const importantChatList = computed(() =>
   chatList.filter((chat) => chat.isImportant === true)
 )
