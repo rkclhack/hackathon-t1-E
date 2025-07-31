@@ -164,7 +164,9 @@ const registerSocketEvent = () => {
       <div class="chat-list">
         <div class="mt-5" v-if="chatList.length !== 0">
           <ul>
-            <li v-for="(chat, i) in chatList" :key="i">
+            <li v-for="(chat, i) in chatList" :key="i"
+            :class="{ 'mine': chat.userName === userName }"
+            >
               <div class="item mt-4">{{ chat.userName }}</div>
               <div class="item mt-4">{{ toJpnTime(chat.sendAt) }}</div>
               <div
@@ -361,4 +363,20 @@ body {
     margin-right: 1rem;
     cursor: pointer;
   }
+
+  .chat-list li.mine {
+  margin-left: auto;
+  background-color: #e0f7fa;
+  justify-content: flex-end;
+  }
+
+  .chat-list li.mine .item {
+  text-align: left; /* 中身は左寄せに戻す */
+  }
+
+  .chat-list li.mine .item:nth-child(2) {
+    margin-left: 0;
+    margin-right: auto;
+  }
+
 </style>
