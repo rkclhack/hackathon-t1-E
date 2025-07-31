@@ -1,5 +1,5 @@
 <script setup>
-import { inject, ref, reactive, onMounted } from "vue"
+import { inject, ref, reactive, onMounted, watch } from "vue"
 import socketManager from '../socketManager.js'
 
 // #region global state
@@ -14,18 +14,24 @@ const socket = socketManager.getInstance()
 
 const chatContent = ref("")
 const isImportant = ref(false)
+const isExecutive = ref(false)
 
 const chatList = reactive([])
 const memoList = ref([])
 
-function chat(chatContent, isImportant, userName) {
+function chat(chatContent, isImportant, userName, isexecutive) {
   // TODO: validate
-
+  if (chatContent.trim() === '') {
+    alert("メッセージが空です")
+    return
+  }
+  
   return ({
     chatContent: chatContent,
     isImportant: isImportant,
     userName: userName,
-    sendAt: new Date()
+    sendAt: new Date(),
+    isexecutive: isexecutive
   })
 }
 
@@ -39,7 +45,6 @@ const toJpnTime = (sendAt) =>
 
 // #endregion
 
-
 // #region lifecycle
 onMounted(() => {
   registerSocketEvent()
@@ -49,11 +54,7 @@ onMounted(() => {
 // #region browser event handler
 // 投稿メッセージをサーバに送信する
 const onPublish = () => {
-  if (!chatContent.value.trim()) {
-    alert("投稿内容を入力してください")
-    return ;
-  }
-  const chatInfo = chat(chatContent.value, isImportant.value, userName.value);
+  const chatInfo = chat(chatContent.value, isImportant.value, userName.value, isExecutive.value);
   socket.emit("publishEvent", chatInfo)
   // 入力欄を初期化
   chatContent.value=""
@@ -62,15 +63,12 @@ const onPublish = () => {
 
 // 退室メッセージをサーバに送信する
 const onExit = () => {
-
+  socket.emit("exitEvent", { user: userName.value });
+  router.push({ name: "login" });
 }
 
 // メモを画面上に表示する
 const onMemo = () => {
-  if (!chatContent.value.trim()) {
-    alert("メモ内容を入力してください")
-    return ;
-  }
   // メモの内容を表示
   memoList.value.unshift(chatContent.value)
   // 入力欄を初期化
@@ -81,17 +79,17 @@ const onMemo = () => {
 // #region socket event handler
 // サーバから受信した入室メッセージ画面上に表示する
 const onReceiveEnter = (data) => {
-  chatList.push()
+  chatList.push(data)
 }
 
 // サーバから受信した退室メッセージを受け取り画面上に表示する
 const onReceiveExit = (data) => {
-  chatList.push()
+  chatList.push(data)
 }
 
 // サーバから受信した投稿メッセージを画面上に表示する
 const onReceivePublish = (data) => {
-  chatList.push(data)
+  chatList.unshift(data)
 }
 // #endregion
 
@@ -100,12 +98,12 @@ const onReceivePublish = (data) => {
 const registerSocketEvent = () => {
   // 入室イベントを受け取ったら実行
   socket.on("enterEvent", (data) => {
-
+    chatList.push(`${data.user} さんが入出しました`)
   })
 
   // 退室イベントを受け取ったら実行
   socket.on("exitEvent", (data) => {
-
+    chatList.push(`${data.user} さんが退出しました`)
   })
 
   // 投稿イベントを受け取ったら実行
@@ -132,11 +130,11 @@ const registerSocketEvent = () => {
       </div>
       <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
-          <ul v-for="(chat, i) in chatList">
-            <li class="item mt-4" :key="i">{{ chat.userName }}</li>
-            <li class="item mt-4" :key="i">{{ toJpnTime(chat.sendAt) }}</li>
-            <li class="item mt-4" :key="i">{{ chat.chatContent }}</li>
-          </ul>
+          <li v-for="(chat, i) in chatList" :key="i">
+            <div class="item mt-4">{{ chat.userName }}</div>
+            <div class="item mt-4">{{ toJpnTime(chat.sendAt) }}</div>
+            <div style="white-space: pre-wrap;" class="item mt-4">{{ chat.chatContent }}</div>
+          </li>
         </ul>
       </div>
     </div>
