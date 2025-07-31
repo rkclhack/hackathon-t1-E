@@ -66,14 +66,9 @@ const onExit = () => {
 
 // メモを画面上に表示する
 const onMemo = () => {
-  // メモの内容を表示
-  if (!chatContent.value)
-    alert("メモ内容を入力してください")
-  else {
-    memoList.value.unshift(chatContent.value)
-    // 入力欄を初期化
-    chatContent.value = ""
-  }
+  memoList.value.unshift(chatContent.value)
+  // 入力欄を初期化
+  chatContent.value = ""
 }
 // #endregion
 
