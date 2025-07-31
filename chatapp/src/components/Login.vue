@@ -46,6 +46,11 @@ const onEnter = () => {
       <div class="input-group">
         <label for="username">ユーザー名</label>
         <input v-model="inputUserName" type="text" class="user-name-text" placeholder="ユーザー名" />
+        <p>ユーザー種別</p>
+        <select v-model="userRole" class="user-role-select">
+          <option value="general">一般</option>
+          <option value="executive">幹部</option>
+        </select>
       </div>
       <button type="button" @click="onEnter" class="button-normal">入室する</button>
     </div>
@@ -95,6 +100,24 @@ const onEnter = () => {
     text-align: center;
   }
 
+  .input-group > p {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+    text-align: center;
+  }
+
+  .user-role-select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    color: #333;
+    background-color: #ffffff;
+    border: 2px solid #ff6600;
+    border-radius: 6px;
+  }
+
   .user-name-text {
     width: 100%;
     padding: 0.5rem;
@@ -102,6 +125,7 @@ const onEnter = () => {
     border-radius: 6px;
     font-size: 1rem;
     margin-bottom: 0;
+    background-color: #ffffff;
   }
 
   .button-normal {
