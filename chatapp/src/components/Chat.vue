@@ -479,4 +479,18 @@ body {
     cursor: pointer;
   }
 
+  .chat-list li.mine {
+    margin-left: auto;
+    background-color: #e0f7fa;
+    justify-content: flex-end;
+  }
+
+  .chat-list li.mine .item {
+    text-align: left;
+  }
+
+  .chat-list li.mine .item:nth-child(2) {
+    margin-left: 0;
+    margin-right: auto;
+  }
 </style>
