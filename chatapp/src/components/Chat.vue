@@ -106,25 +106,25 @@ const onReceivePublish = (data) => {
 }
 
 const onDeleteMessage = () => {
-  if(!deleteFlag.value){
-    alert("連続でメッセージは削除できません")
-    return
-  }
+  const isConfirmed =confirm('本当に削除しますか？')
 
   const latestChat = findLatestMessage(userName.value)
   if(!latestChat){
     alert("削除するメッセージがありません")
     return
   }
+  if(!deleteFlag.value){
+    alert("連続でメッセージは削除できません")
+    return
+  }
   console.log(latestChat)
-  
-  socket.emit("deleteEvent",{
-    userName: userName.value,
-    sendAt: latestChat.sendAt
-  })
-
-  deleteFlag.value = false
-  alert("メッセージが削除されました")
+  if (isConfirmed){
+    socket.emit("deleteEvent",{
+      userName: userName.value,
+      sendAt: latestChat.sendAt
+    })
+    deleteFlag.value = false
+  }
 }
 
 const onReceiveDelete = (deleteInfo) => {
