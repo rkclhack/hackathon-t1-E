@@ -141,12 +141,6 @@ const registerSocketEvent = () => {
         <button @click="onPublish"  class="button-normal">投稿</button>
         <button @click="onMemo" class="button-normal util-ml-8px">メモ</button>
       </div>
-      <div class="mt-5">
-        <label>
-          <input type="checkbox" v-model="isImportant" :disabled="!isExecutive?.value" />
-          重要メッセージにする（※幹部のみ）
-        </label>
-      </div>
       <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
           <li v-for="(chat, i) in chatList" :key="i">
