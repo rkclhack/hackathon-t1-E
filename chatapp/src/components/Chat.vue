@@ -193,7 +193,8 @@ const registerSocketEvent = () => {
           class="mt-5">
         </v-switch>
       </div>
-      <button @click ="onPublish"  class="send-btn">投稿</button>
+      <button @click="onDeleteMessage" class="delete-btn">削除</button>
+      <button @click ="onPublish" class="send-btn">投稿</button>
     </div>
   </div>
 </template>
@@ -297,7 +298,6 @@ const registerSocketEvent = () => {
 
   .send-btn {
     flex: 0 0 auto;
-    margin-left: auto;
     background-color: #ff6600;
     border: none;
     color: #fff;
@@ -317,14 +317,15 @@ const registerSocketEvent = () => {
     order: 2; margin-left: 0.5rem;
   }
 
-    .executive-message {
-  font-weight: bold;
-  color: red;
+  .executive-message {
+    font-weight: bold;
+    color: red;
   }
 
   .delete-btn {
     background-color: #ff6600;
     border: none;
+    margin-left: auto;
     color: #fff;
     font-size: 1.1rem;
     border-radius: 4px;
