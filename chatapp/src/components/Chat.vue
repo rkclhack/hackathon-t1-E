@@ -27,9 +27,6 @@ const { isSupported, show, notification } = useWebNotification({
 const chatContent = ref("")
 const isImportant = ref(false)
 const chatList = reactive([])
-const importantChatList = computed(() =>
-  chatList.filter((chat) => chat.isImportant === true)
-)
 
 function chat(chatContent, isImportant, userName, isExecutive) {
   // TODO: validate
@@ -73,7 +70,7 @@ const onPublish = () => {
 // サーバから受信した投稿メッセージを画面上に表示する
 const onReceivePublish = (data) => {
   chatList.unshift(data)
-
+  
   // 通知サポート＆自分の投稿じゃないときだけ表示
   if (isSupported && data.userName !== userName.value) {
     show({
@@ -266,5 +263,5 @@ body {
   width: 40%;
   height: calc(100vh - 80px);
   border-left: 1px solid #282828;
-}
+  }
 </style>
