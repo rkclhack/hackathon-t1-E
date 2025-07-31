@@ -37,7 +37,7 @@ function chat(chatContent, isImportant, userName, isExecutive) {
     alert("メッセージが空です")
     return
   }
-  
+
   return ({
     chatContent: chatContent,
     isImportant: isImportant,
@@ -62,7 +62,7 @@ const onPublish = () => {
   const chatInfo = chat(chatContent.value, isImportant.value, userName.value, isExecutive.value);
   socket.emit("publishEvent", chatInfo)
   // 入力欄を初期化
-  chatContent.value=""
+  chatContent.value = ""
 
 }
 
@@ -74,7 +74,7 @@ const onPublish = () => {
 const onReceivePublish = (data) => {
   chatList.unshift(data)
 
-   // 通知サポート＆自分の投稿じゃないときだけ表示
+  // 通知サポート＆自分の投稿じゃないときだけ表示
   if (isSupported && data.userName !== userName.value) {
     show({
       title: `${data.userName} さんからの新着メッセージ`,
@@ -105,143 +105,166 @@ const registerSocketEvent = () => {
       </router-link>
     </header>
 
-    <div class="chat-list">
-      <div class="mt-5" v-if="chatList.length !== 0">
-        <ul>
-          <li v-for="(chat, i) in chatList" :key="i">
-            <div class="item mt-4">{{ chat.userName }}</div>
-            <div class="item mt-4">{{ toJpnTime(chat.sendAt) }}</div>
-            <div
-              class="item mt-4"
-              :class="{ 'executive-message': chat.isExecutive }"
-              style="white-space: pre-wrap;"
-            >
-              {{ chat.chatContent }}
-            </div>
-          </li>
-        </ul>
+    <div class="chat-inner">
+      <div class="chat-list">
+        <div class="mt-5" v-if="chatList.length !== 0">
+          <ul>
+            <li v-for="(chat, i) in chatList" :key="i">
+              <div class="item mt-4">{{ chat.userName }}</div>
+              <div class="item mt-4">{{ toJpnTime(chat.sendAt) }}</div>
+              <div class="item mt-4" :class="{ 'executive-message': chat.isExecutive }" style="white-space: pre-wrap;">
+                {{ chat.chatContent }}
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="chat-input-area">
+          <textarea v-model="chatContent" placeholder="投稿文を入力してください" rows="4" class="chat-input"></textarea>
+          <div class="mt-5">
+            <v-switch v-model="isImportant" label="重要">
+            </v-switch>
+            <button @click="onPublish" class="send-btn">投稿</button>
+          </div>
+        </div>
+      </div>
+      <div class="important-chat-list">
+        <important-chat></important-chat>
       </div>
     </div>
-
-    <div class="chat-input-area">
-      <textarea v-model="chatContent" placeholder="投稿文を入力してください" rows="4" class="chat-input"></textarea>
-      <div class="mt-5">
-        <v-switch
-          v-model="isImportant"
-          label="重要">
-        </v-switch>
-        <button @click="onPublish"  class="send-btn">投稿</button>
-      </div>
-
-    </div>
-
   </div>
 </template>
 
 <style scoped>
-  .link {
-    text-decoration: none;
-  }
+body {
+  overflow-y: hidden;
+}
 
-  .area {
-    width: 500px;
-    border: 1px solid #000;
-    margin-top: 8px;
-  }
+.link {
+  text-decoration: none;
+}
 
-  .item {
-    display: block;
-  }
+.area {
+  width: 500px;
+  border: 1px solid #000;
+  margin-top: 8px;
+}
 
-  .util-ml-8px {
-    margin-left: 8px;
-  }
+.item {
+  display: block;
+}
 
-  .button-exit {
-    margin-left: 1.5rem;
-    background-color: #e53935;
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    padding: 0.5rem 1rem;
-  }
+.util-ml-8px {
+  margin-left: 8px;
+}
 
-  .chat-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    background-color: #ffffff;
-  }
+.button-exit {
+  margin-left: 1.5rem;
+  background-color: #e53935;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+}
 
-  .chat-header {
-    display: flex;
-    justify-content: flex-start; 
-    align-items: center;
-    background-color: #ff6600;
-    color: #fff;
-    border-bottom: 2px solid #c0c0c0;
-    padding: 0.8rem 1rem;
-  }
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+}
 
-  .chat-header h1 {
-    margin-right: auto;
-  }
+.chat-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: #ff6600;
+  color: #fff;
+  border-bottom: 2px solid #c0c0c0;
+  padding: 0 1rem;
+  height: 78px;
+}
 
-  .chat-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1rem;
-  }
+.chat-header h1 {
+  margin-right: auto;
+}
 
-  .chat-list li {
-    list-style: none;
-    display: flex;
-    align-items: center;
-    background-color: #fff3e0;
-    border-radius: 6px;
-    padding: 0.4rem 0.8rem;
-    margin-bottom: 0.6rem;
-    max-width: 500px; 
-  }
+.chat-list {
+  overflow-y: auto;
+  /* padding: 1rem; */
+  width: 60%;
+}
 
-  .chat-list li .item {
-    display: inline;        
-  }
+.chat-list li {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  background-color: #fff3e0;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  margin-bottom: 0.6rem;
+  max-width: 500px;
+}
 
-  .chat-list li .item:nth-child(1) { order: 1; font-weight: 600; }
-  .chat-list li .item:nth-child(3) { order: 2; flex: 1; }
-  .chat-list li .item:nth-child(2) { 
-    order: 3; 
-    font-size: 0.8rem; 
-    color: #666;
-    margin-left: auto;
-  }
+.chat-list li .item {
+  display: inline;
+}
 
-  .chat-input-area {
-    display: flex;
-    align-items: center;
-    background-color: #f2eebf;
-    border-top: 1px solid #c0c0c0;
-    padding: 0.5rem;
-  }
+.chat-list li .item:nth-child(1) {
+  order: 1;
+  font-weight: 600;
+}
 
-  .chat-input {
-    flex: 1;
-    height: 2.5rem;
-    background-color: #ffffff; 
-    border: 1px solid #ff6600;
-    border-radius: 4px;
-    padding: 0.4rem;
-    margin-right: 0.5rem;
-  }
+.chat-list li .item:nth-child(3) {
+  order: 2;
+  flex: 1;
+}
 
-  .send-btn {
-    background-color: #ff6600;
-    border: none;
-    color: #fff;
-    font-size: 1.1rem;
-    border-radius: 4px;
-    padding: 0.5rem 0.8rem;
-    cursor: pointer;
-  }
+.chat-list li .item:nth-child(2) {
+  order: 3;
+  font-size: 0.8rem;
+  color: #666;
+  margin-left: auto;
+}
+
+.chat-input-area {
+  position: absolute;
+  display: flex;
+  bottom: 0;
+  width: 60%;
+  align-items: center;
+  background-color: #f2eebf;
+  border-top: 1px solid #c0c0c0;
+  padding: 0.5rem;
+}
+
+.chat-input {
+  flex: 1;
+  height: 2.5rem;
+  background-color: #ffffff;
+  border: 1px solid #ff6600;
+  border-radius: 4px;
+  padding: 0.4rem;
+  margin-right: 0.5rem;
+}
+
+.send-btn {
+  background-color: #ff6600;
+  border: none;
+  color: #fff;
+  font-size: 1.1rem;
+  border-radius: 4px;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+}
+
+.chat-inner {
+  display: flex;
+  flex-direction: row;
+  height: calc(100vh - 80px);
+}
+
+.important-chat-list {
+  width: 40%;
+  height: calc(100vh - 80px);
+  border-left: 1px solid #282828;
+}
 </style>
