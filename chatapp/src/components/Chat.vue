@@ -66,6 +66,7 @@ const onExit = () => {
 
 // メモを画面上に表示する
 const onMemo = () => {
+  // メモの内容を表示
   memoList.value.unshift(chatContent.value)
   // 入力欄を初期化
   chatContent.value = ""
