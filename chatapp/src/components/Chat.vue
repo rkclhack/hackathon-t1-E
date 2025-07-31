@@ -1,6 +1,7 @@
 <script setup>
 import { inject, ref, reactive, onMounted } from "vue"
 import socketManager from '../socketManager.js'
+import { useWebNotification } from '@vueuse/core'
 
 // #region global state
 const userName = inject("userName")
@@ -10,6 +11,14 @@ const isExecutive = inject("isExecutive")
 // #region local variable
 const socket = socketManager.getInstance()
 // #endregion
+
+const { isSupported, show, notification } = useWebNotification({
+  title: 'チャット通知',
+  dir: 'auto',
+  lang: 'ja',
+  renotify: true,
+  tag: 'chat-message',
+})
 
 // #region reactive variable
 
@@ -66,6 +75,14 @@ const onPublish = () => {
 // サーバから受信した投稿メッセージを画面上に表示する
 const onReceivePublish = (data) => {
   chatList.unshift(data)
+
+   // 通知サポート＆自分の投稿じゃないときだけ表示
+  if (isSupported && data.userName !== userName.value) {
+    show({
+      title: `${data.userName} さんからの新着メッセージ`,
+      body: data.chatContent,
+    })
+  }
 }
 // #endregion
 
@@ -138,4 +155,10 @@ const registerSocketEvent = () => {
   color: #000;
   margin-top: 8px;
 }
+
+.executive-message {
+  font-weight: bold;
+  color: red;
+}
+
 </style>
