@@ -23,14 +23,6 @@ function chat(chatContent, isImportant, userName, isExecutive) {
     alert("メッセージが空です")
     return
   }
-
-  console.log({
-    chatContent: chatContent,
-    isImportant: isImportant,
-    userName: userName,
-    sendAt: new Date(),
-    isExecutive: isExecutive
-  })
   
   return ({
     chatContent: chatContent,
