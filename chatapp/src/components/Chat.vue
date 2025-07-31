@@ -27,6 +27,10 @@ onMounted(() => {
 // #region browser event handler
 // 投稿メッセージをサーバに送信する
 const onPublish = () => {
+  if (chatContent.value.trim() === '') {
+    alert("メッセージが空です")
+    return
+  }
   socket.emit("publishEvent",chatContent.value)
   // 入力欄を初期化
   chatContent.value=""
@@ -98,7 +102,7 @@ const registerSocketEvent = () => {
       </div>
       <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
-          <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat }}</li>
+          <li style="white-space: pre-wrap;" class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat }}</li>
         </ul>
       </div>
     </div>
