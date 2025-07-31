@@ -21,7 +21,11 @@ const memoList = ref([])
 
 function chat(chatContent, isImportant, userName, isexecutive) {
   // TODO: validate
-
+  if (chatContent.trim() === '') {
+    alert("メッセージが空です")
+    return
+  }
+  
   return ({
     chatContent: chatContent,
     isImportant: isImportant,
@@ -116,7 +120,7 @@ const registerSocketEvent = () => {
       <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
           <ul>
-            <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat.chatContent }}</li>
+            <li style="white-space: pre-wrap;" class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat.chatContent }}</li>
           </ul>
         </ul>
       </div>
