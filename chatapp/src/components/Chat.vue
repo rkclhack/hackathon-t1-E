@@ -124,7 +124,6 @@ const onDeleteMessage = () => {
       sendAt: latestChat.sendAt
     })
     deleteFlag.value = false
-    alert("メッセージが削除されました")
   }
 }
 
