@@ -1,6 +1,9 @@
 <script setup>
-import { inject, ref, reactive, onMounted, computed } from "vue"
+import { inject, ref, reactive, onMounted, computed, provide } from "vue"
 import socketManager from '../socketManager.js'
+
+import toJpnTime from "../utils/toJpnTime.js"
+import ImportantChat from "./ImportantChat.vue"
 
 // #region global state
 const userName = inject("userName")
@@ -11,7 +14,6 @@ const socket = socketManager.getInstance()
 // #endregion
 
 // #region reactive variable
-
 const chatContent = ref("")
 const isImportant = ref(false)
 const isExecutive = ref(false)
@@ -38,14 +40,7 @@ function chat(chatContent, isImportant, userName, isexecutive) {
   })
 }
 
-const toJpnTime = (sendAt) =>
-  new Date(sendAt).toLocaleTimeString("ja-JP",
-    { timeZone: "Asia/Tokyo",
-      hour: "2-digit",
-      minute: "2-digit"
-    }
-  )
-
+provide("chatList", chatList)
 // #endregion
 
 // #region lifecycle
@@ -144,6 +139,7 @@ const registerSocketEvent = () => {
     <router-link to="/" class="link">
       <button type="button" class="button-normal button-exit" @click="onExit">退室する</button>
     </router-link>
+    <important-chat></important-chat>
     <ul class="memo">
       <li v-for="memo in memoList" :key="memo">
         {{ memo }}
