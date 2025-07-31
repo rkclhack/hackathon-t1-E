@@ -11,10 +11,26 @@ const socket = socketManager.getInstance()
 // #endregion
 
 // #region reactive variable
-const chatContent = ref("")
-const chatList = reactive([])
 
+const chatContent = ref("")
+const isImportant = ref(false)
+const isExecutive = ref(false)
+
+const chatList = reactive([])
 const memoList = ref([])
+
+function chat(chatContent, isImportant, userName, isexecutive) {
+  // TODO: validate
+
+  return ({
+    chatContent: chatContent,
+    isImportant: isImportant,
+    userName: userName,
+    sendAt: new Date(),
+    isexecutive: isexecutive
+  })
+}
+
 // #endregion
 
 
@@ -27,7 +43,8 @@ onMounted(() => {
 // #region browser event handler
 // 投稿メッセージをサーバに送信する
 const onPublish = () => {
-  socket.emit("publishEvent",chatContent.value)
+  const chatInfo = chat(chatContent.value, isImportant.value, userName.value, isExecutive.value);
+  socket.emit("publishEvent", chatInfo)
   // 入力欄を初期化
   chatContent.value=""
 
@@ -98,7 +115,9 @@ const registerSocketEvent = () => {
       </div>
       <div class="mt-5" v-if="chatList.length !== 0">
         <ul>
-          <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat }}</li>
+          <ul>
+            <li class="item mt-4" v-for="(chat, i) in chatList" :key="i">{{ chat.chatContent }}</li>
+          </ul>
         </ul>
       </div>
     </div>
