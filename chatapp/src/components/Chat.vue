@@ -330,7 +330,6 @@ const registerSocketEvent = () => {
   margin-left: auto;
   background-color: #e0f7fa;
   justify-content: flex-end;
-  /* text-align: right; */
   }
 
   .chat-list li.mine .item {
