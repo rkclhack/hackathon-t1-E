@@ -32,7 +32,7 @@ const toggleEdit = () => {
   <div class="schedule-container">
     <div class="schedule-header">
       <h2>スケジュール</h2>
-      <div class="toggle" @click="canEdit = !canEdit">
+      <div v-if="isExective" @click="toggleEdit" class="toggle">
         {{ canEdit ? '完了' : '編集' }}
       </div>
     </div>
@@ -100,6 +100,7 @@ const toggleEdit = () => {
   white-space: pre-wrap;
   word-wrap: break-word;
   min-height: 100%;
+  border: 1.5px solid red;
 }
 
 .inputarea {
@@ -119,7 +120,7 @@ textarea {
 }
 
 .has-border {
-  border: 1.5px solid #015ECC;
+  border: 1.5px solid red;
   border-radius: 4px;
 }
 </style>
