@@ -1,8 +1,9 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
 
 const canEdit = ref(false)
 const scheduleContent = ref("")
+const isExective = inject ("isExecutive")
 </script>
 
 <template>
@@ -10,7 +11,7 @@ const scheduleContent = ref("")
     <h2 class="mt-2">
       スケジュール
     </h2>
-    <div @click="canEdit = !canEdit" class="toggle">{{ canEdit ? '✔︎' : '➕' }}</div>
+    <div v-if="isExective" @click="canEdit = !canEdit" class="toggle">{{ canEdit ? '✔︎' : '➕' }}</div>
     <div v-if="!canEdit" class="content">
       {{ scheduleContent }}
     </div>
