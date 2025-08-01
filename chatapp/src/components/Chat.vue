@@ -167,10 +167,12 @@ const registerSocketEvent = () => {
             <li v-for="(chat, i) in chatList" :key="i"
             :class="{ 'mine': chat.userName === userName }"
             >
-              <div class="item mt-4">{{ chat.userName }}</div>
+              <div class="item mt-4">
+                <span class="user-name-badge">{{ chat.userName }}</span>
+              </div>
               <div class="item mt-4">{{ toJpnTime(chat.sendAt) }}</div>
               <div
-                class="item mt-4"
+                class="item mt-4 chat-text"
                 :class="{ 'executive-message': chat.isExecutive }"
                 style="white-space: pre-wrap;"
               >
@@ -179,22 +181,26 @@ const registerSocketEvent = () => {
             </li>
           </ul>
         </div>
-        <div class="chat-input-area">
-          <textarea v-model="chatContent" placeholder="投稿文を入力してください" rows="4" class="chat-input"></textarea>
-          <div class="mt-5">
-            <v-switch
-              v-model="isImportant"
-              label="重要"
-              :disabled="!isExecutive">
-            </v-switch>
-            <button @click="onDeleteMessage" class="delete-btn">削除</button>
-            <button @click="onPublish" class="send-btn">投稿</button>
-          </div>
-        </div>
       </div>
       <div class="important-chat-list">
         <important-chat></important-chat>
       </div>
+    </div>
+
+    <div class="chat-input-area">
+      <textarea v-model="chatContent" placeholder="投稿文を入力してください" rows="4" class="chat-input"></textarea>
+      <div class="important-wrapper" v-if="isExecutive">
+        <v-chip v-if="isImportant" color="red lighten-1" text-color="white" small>
+          重要
+        </v-chip>
+        <v-switch
+          v-model="isImportant"
+          :color="isImportant ? 'red lighten-1' : 'grey'"
+          class="mt-5">
+        </v-switch>
+      </div>
+      <button @click="onDeleteMessage" class="delete-btn">削除</button>
+      <button @click ="onPublish" class="send-btn">投稿</button>
     </div>
   </div>
 </template>
@@ -338,25 +344,93 @@ body {
   color: red;
   }
 
-  .delete-btn {
-    background-color: #ff6600;
+  .item {
+    display: block;
+  }
+
+  .util-ml-8px {
+    margin-left: 8px;
+  }
+
+  .button-exit {
+    margin-left: 1.5rem;
+    background-color: #e53935;
+    color: #ffffff;
     border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+  }
+
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #ffffff;
+  }
+
+  .chat-header {
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center;
+    background-color: #ff6600;
     color: #fff;
-    font-size: 1.1rem;
-    border-radius: 4px;
-    padding: 0.5rem 0.8rem;
-    margin-right: 1rem;
-    cursor: pointer;
+    border-bottom: 2px solid #c0c0c0;
+    padding: 0.8rem 1rem;
+  }
+
+  .chat-header h1 {
+    margin-right: auto;
+  }
+
+  .chat-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  .chat-list li {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    background-color: #fff3e0;
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    margin-bottom: 0.6rem;
+    max-width: 500px; 
+  }
+
+  .chat-list li .item {
+    display: inline;        
+  }
+
+  .chat-list li .item:nth-child(1) { order: 1; font-weight: 600; }
+  .chat-list li .item:nth-child(3) { order: 2; flex: 1; }
+  .chat-list li .item:nth-child(2) { 
+    order: 3; 
+    font-size: 0.8rem; 
+    color: #666;
+    margin-left: auto;
+  }
+
+  .important-wrapper {
+    display: flex;
+    align-items: center; 
+    margin: 0 1rem 0 0;
+  }
+
+  .important-wrapper .v-chip { 
+    order: 2; margin-left: 0.5rem;
   }
 
   .executive-message {
-  font-weight: bold;
-  color: red;
+    font-weight: bold;
+    color: red;
   }
 
   .delete-btn {
     background-color: #ff6600;
     border: none;
+    margin-left: auto;
     color: #fff;
     font-size: 1.1rem;
     border-radius: 4px;
@@ -366,13 +440,13 @@ body {
   }
 
   .chat-list li.mine {
-  margin-left: auto;
-  background-color: #e0f7fa;
-  justify-content: flex-end;
+    margin-left: auto;
+    background-color: #e0f7fa;
+    justify-content: flex-end;
   }
 
   .chat-list li.mine .item {
-  text-align: left; /* 中身は左寄せに戻す */
+    text-align: left;
   }
 
   .chat-list li.mine .item:nth-child(2) {
@@ -380,4 +454,18 @@ body {
     margin-right: auto;
   }
 
+  .user-name-badge {
+    background-color: white;
+    color: #1f1f1f;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 999px;
+    display: inline-block;
+    font-size: 0.95rem;
+    line-height: 1;
+  }
+
+  .chat-list li .chat-text {
+    margin-left: 0.75rem;
+  }
 </style>

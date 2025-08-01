@@ -54,6 +54,9 @@ const markAsRead = () => {
 
 <template>
   <div class="important-chat-list-box">
+    <div class="important-header">
+      <h2>重要なお知らせ</h2>
+    </div>
     <ul class="mt-5">
       <li 
         v-for="(importantChat, i) in importantChatList" 
@@ -74,6 +77,7 @@ const markAsRead = () => {
       <button @click="markAsRead" class="read-button">既読</button>
     </div>
   </div>
+
 </template>
 
 <style>
@@ -151,5 +155,16 @@ const markAsRead = () => {
   order: 2;
   flex: 1;
   font-weight: 600;
+}
+
+.important-header {
+  background-color: #d32f2f;
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 4px 4px 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  flex: 0 0 auto;
 }
 </style>
