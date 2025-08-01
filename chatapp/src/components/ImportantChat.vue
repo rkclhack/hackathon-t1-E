@@ -73,8 +73,11 @@ const markAsRead = () => {
         <div style="white-space: pre-wrap;" class="item mt-4">{{ importantChat.chatContent }}</div>
       </li>
     </ul>
-    <div class="read-button-container mb-4">
-      <button @click="markAsRead" class="read-button">既読</button>
+    <div class="important-footer">
+      <div class="left-slot"></div>
+      <div class="right-slot">
+        <button @click="markAsRead" class="read-button">既読</button>
+      </div>
     </div>
   </div>
 
@@ -92,7 +95,7 @@ const markAsRead = () => {
  }
 
 .read-button {
-  background-color: #ff6600;
+  background-color: #f7485d;
   color: white;
   border: none;
   padding: 0.5rem 0.8rem;
@@ -101,14 +104,12 @@ const markAsRead = () => {
   font-size: 1.1rem;
 }
 
-
 .important-chat-list-box {
   overflow-y: auto;
-  padding: 1rem;
-  width: 80%;
   height: 100%;
   margin: 0 auto;
   position: relative;
+  padding-bottom: 4rem;
 }
 
 .important-chat-list-box li {
@@ -166,5 +167,25 @@ const markAsRead = () => {
   top: 0;
   z-index: 5;
   flex: 0 0 auto;
+}
+
+.important-footer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #f1c0c0;
+  border-top: 1px solid #c0c0c0;
+  width: 100%; /* 横幅をとって見た目を一般欄に近づける */
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+/* 左側スペースを伸ばして右のボタンを右寄せに */
+.left-slot {
+  flex: 1;
 }
 </style>

@@ -6,7 +6,6 @@ import { useWebNotification } from '@vueuse/core'
 import toJpnTime from "../utils/toJpnTime.js"
 import ImportantChat from "./ImportantChat.vue"
 import Schedule from "./Schedule.vue"
-import DropDownList from "./DropDownList.vue"
 
 // #region global state
 const userName = inject("userName")
@@ -159,7 +158,18 @@ const registerSocketEvent = () => {
   <div class="chat-container">
     <header class="chat-header">
       <h1 class="text-h3 font-weight-medium">バレーボール同好会</h1>
-      <p>ユーザ：{{ userName }}さん</p>
+      <v-select
+        v-model="mode"
+        :items="['重要事項', 'スケジュール']"
+        hide-details
+        dense
+        variant="solo"
+        class="display-mode-select"
+        style="min-width: 140px; max-width: 220px; margin-right: 1rem;"
+        label="表示モード"
+         :menu-props="{ offsetY: true, zIndex: 1000 }"
+      ></v-select>
+      <p>ユーザー：{{ userName }}さん</p>
       <router-link to="/" class="link">
         <button type="button" class="button-normal button-exit" @click="onExit">退室</button>
       </router-link>
@@ -478,4 +488,11 @@ body {
   .move {
     transform: translateX(1000%);
   }
+
+::v-deep .display-mode-select .v-field {
+  background: #ffd4c2 !important;
+  border-radius: 6px;
+  padding: 0 8px;
+  min-height: 36px;
+}
 </style>

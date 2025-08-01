@@ -39,7 +39,7 @@ const onEnter = () => {
 <template>
   <div class="login-container">
     <div class="login-box">
-      <h1 class="title">誰も取り残さないチャットアプリ</h1>
+      <h1 class="title">AllLinkChat</h1>
       <div class="input-group">
         <label for="username">ユーザー名</label>
         <input v-model="inputUserName" type="text" class="user-name-text" placeholder="ユーザー名" />
