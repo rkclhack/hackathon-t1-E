@@ -5,6 +5,8 @@ import { useWebNotification } from '@vueuse/core'
 
 import toJpnTime from "../utils/toJpnTime.js"
 import ImportantChat from "./ImportantChat.vue"
+import Schedule from "./Schedule.vue"
+import DropDownList from "./DropDownList.vue"
 
 // #region global state
 const userName = inject("userName")
@@ -27,6 +29,7 @@ const { isSupported, show, notification } = useWebNotification({
 const chatContent = ref("")
 const isImportant = ref(false)
 const chatList = reactive([])
+const mode = ref("重要事項")
 
 function chat(chatContent, isImportant, userName, isExecutive) {
   // TODO: validate
@@ -57,6 +60,7 @@ const findLatestMessage = (userName) => {
 const deleteFlag = ref(false)
 
 provide("chatList", chatList)
+provide("mode", mode)
 
 // #endregion
 
@@ -183,8 +187,10 @@ const registerSocketEvent = () => {
         </div>
       </div>
       <div class="important-chat-list">
-        <important-chat></important-chat>
+        <important-chat v-show="mode === '重要事項'" :class="{ move: mode !== '重要事項' }"></important-chat>
       </div>
+      <schedule v-show="mode === 'スケジュール'" :class="{ move: mode !== 'スケジュール' }"></schedule>
+      <drop-down-list></drop-down-list>
     </div>
 
     <div class="chat-input-area">
@@ -467,5 +473,9 @@ body {
 
   .chat-list li .chat-text {
     margin-left: 0.75rem;
+  }
+
+  .move {
+    transform: translateX(1000%);
   }
 </style>
