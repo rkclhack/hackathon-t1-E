@@ -171,10 +171,12 @@ const registerSocketEvent = () => {
             <li v-for="(chat, i) in chatList" :key="i"
             :class="{ 'mine': chat.userName === userName }"
             >
-              <div class="item mt-4">{{ chat.userName }}</div>
+              <div class="item mt-4">
+                <span class="user-name-badge">{{ chat.userName }}</span>
+              </div>
               <div class="item mt-4">{{ toJpnTime(chat.sendAt) }}</div>
               <div
-                class="item mt-4"
+                class="item mt-4 chat-text"
                 :class="{ 'executive-message': chat.isExecutive }"
                 style="white-space: pre-wrap;"
               >
@@ -456,6 +458,21 @@ body {
   .chat-list li.mine .item:nth-child(2) {
     margin-left: 0;
     margin-right: auto;
+  }
+
+  .user-name-badge {
+    background-color: white;
+    color: #1f1f1f;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 999px;
+    display: inline-block;
+    font-size: 0.95rem;
+    line-height: 1;
+  }
+
+  .chat-list li .chat-text {
+    margin-left: 0.75rem;
   }
 
   .move {
