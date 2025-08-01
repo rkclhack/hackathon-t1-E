@@ -1,8 +1,31 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, inject, watch, onMounted } from 'vue';
+import socketManager from '../socketManager';
 
 const canEdit = ref(false)
 const scheduleContent = ref("")
+const isExective = inject ("isExecutive")
+
+const socket = socketManager.getInstance()
+
+const onReceiveSchedule = (data) => {
+  scheduleContent.value = data;
+  console.log(scheduleContent.value)
+}
+
+onMounted(() => {
+  socket.on("scheduleUpdate", onReceiveSchedule);
+  socket.emit("getSchedule");
+}) 
+
+//編集の反映
+const toggleEdit = () => {
+  canEdit.value = !canEdit.value;
+  if (!canEdit.value){
+    socket.emit("updateSchedule", scheduleContent.value)
+  }
+}
+
 </script>
 
 <template>
